@@ -1,0 +1,9 @@
+services:
+  im-connector:
+    container_name: im-connector
+    image: harbor.cloud.infn.it/datacloud-middleware/im-connector:ci-python3.12
+    ports:
+      - "8000:80"
+    restart: unless-stopped
+    env_file:
+      - ../.env

@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "im-connector"
+version = "0.1.0"
+description = "Component to exchange information between the PaaS orchestrator and the UPV Infrastructure Manager (IM)"
+authors = ["Caterina Marcon <caterina.marcon@mi.infn.it>", "Giovanni Savarese <giovanni.savarese@ba.infn.it>"]
+license = "Apache License 2.0"
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = ">=3.12,<4"
+pydantic  = ">=2.11.7,<3.0.0"
+pydantic-settings = ">=2.9.1,<3.0.0"
+fastapi = {extras = ["standard"], version = "^0.115.12"}
+flaat = "^1.2.0"
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^4.2.0"
+ruff = "^0.12.1"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff.lint]
+# Add rules on PyFlakes(F), pycodestyle (E,W), isort (I), 
+# mccabe (C90) pep8-naming (N), pydocstyle (D), pyupgrade (UP), 
+# ruff specific rules (RUF),
+# flake8-bugbear (B), flake8-logging-format (G), flake8-quotes (Q)
+extend-select = ["B", "C90", "E", "D", "F", "G", "I", "N", "Q", "RUF", "UP", "W"]
