@@ -72,11 +72,12 @@ app.add_middleware(
     dependencies=[Security(check_authorization)]
 )
 async def create_kubernetes_deployment(request: Request):
-    # request.headers <-- recuperiamo token?
-    # request.body    <-- recuperiamo tosca?
     im_url = settings.IM_HOST
-    jwt = request.headers
-    tosca_template = request.body
+
+    jwt = request.headers.get("authorization").replace("Bearer ","")
+
+    raw_body = await request.body()
+    tosca_template = raw_body.decode()
 
     status = create_k8s_deployment(im_url, jwt, tosca_template)
 
