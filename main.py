@@ -66,7 +66,7 @@ app.add_middleware(
 
 
 @app.post(
-    "/create_deployment",
+    "/api/v1/deployments",
     summary="Create Kubernetes Deployment",
     description="Given a TOSCA template, trigger the InfrastructureManager to create a Kubernetes deployment",
     dependencies=[Security(check_authorization)]
