@@ -2,7 +2,7 @@
 
 import logging
 
-from config import Settings
+from im_connector.config import Settings
 
 
 def get_logger(settings: Settings) -> logging.Logger:

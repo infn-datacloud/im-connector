@@ -6,15 +6,15 @@ and provides endpoints to interact with IM.
 
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request, Security
+from fastapi import FastAPI, Security
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response as FastAPIResponse
 
 from im_connector.im import create_k8s_deployment
 from im_connector.models import DeploymentCreate
-from auth import check_authorization, configure_flaat, HttpAuthzCredsDep
-from config import get_settings, SettingsDep
-from logger import get_logger
+from im_connector.auth import check_authorization, configure_flaat, HttpAuthzCredsDep
+from im_connector.config import get_settings, SettingsDep
+from im_connector.logger import get_logger
 
 settings = get_settings()
 
