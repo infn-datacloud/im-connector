@@ -29,7 +29,7 @@ RUN pip install --upgrade pip \
     && pip install --no-cache-dir --upgrade -r /app/requirements.txt
 
 # Copy the application code
-COPY ./api /app/api
+COPY ./im_connector /app/im_connector
 COPY ./main.py /app/main.py
 COPY ./config.py /app/config.py
 COPY ./auth.py /app/auth.py

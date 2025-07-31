@@ -10,8 +10,8 @@ from fastapi import FastAPI, Request, Security
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response as FastAPIResponse
 
-from api.im import create_k8s_deployment
-from api.models import DeploymentCreate
+from im_connector.im import create_k8s_deployment
+from im_connector.models import DeploymentCreate
 from auth import check_authorization, configure_flaat, HttpAuthzCredsDep
 from config import get_settings, SettingsDep
 from logger import get_logger

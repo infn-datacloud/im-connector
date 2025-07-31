@@ -3,7 +3,7 @@ from fastapi import HTTPException, status
 from fastapi.responses import Response as FastAPIResponse
 from pydantic import AnyHttpUrl
 
-from api.fastapi_response_wrapper import FastAPIResponseMapper
+from im_connector.fastapi_response_wrapper import FastAPIResponseMapper
 
 
 def create_k8s_deployment(*,
