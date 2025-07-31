@@ -29,10 +29,6 @@ RUN pip install --upgrade pip \
     && pip install --no-cache-dir --upgrade -r /app/requirements.txt
 
 # Copy the application code
-COPY ./im_connector /app/im_connector
-COPY ./main.py /app/main.py
-COPY ./config.py /app/config.py
-COPY ./auth.py /app/auth.py
-COPY ./logger.py /app/logger.py
+COPY ./im_connector ./im_connector
 
-CMD ["fastapi", "run", "/app/main.py", "--port", "80"]
+CMD ["fastapi", "run", "/app/im_connector/main.py", "--port", "80"]
