@@ -7,3 +7,12 @@ services:
     restart: unless-stopped
     env_file:
       - ../.env
+
+  opa:
+    image: openpolicyagent/opa
+    container_name: opa
+    ports:
+      - 8181:8181
+    volumes:
+      - ../opa/data:/im_connector:ro
+    command: run --server --log-level debug --addr 0.0.0.0:8181 /im_connector
