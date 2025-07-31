@@ -8,10 +8,12 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request, Security
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response as FastAPIResponse
 
 from api.im import create_k8s_deployment
-from auth import check_authorization, configure_flaat
-from config import get_settings
+from api.models import DeploymentCreate
+from auth import check_authorization, configure_flaat, HttpAuthzCredsDep
+from config import get_settings, SettingsDep
 from logger import get_logger
 
 settings = get_settings()
@@ -71,14 +73,15 @@ app.add_middleware(
     description="Given a TOSCA template, trigger the InfrastructureManager to create a Kubernetes deployment",
     dependencies=[Security(check_authorization)]
 )
-async def create_kubernetes_deployment(request: Request):
-    im_url = settings.IM_HOST
+async def create_kubernetes_deployment(payload: DeploymentCreate, credentials: HttpAuthzCredsDep,
+                                       app_settings: SettingsDep) -> FastAPIResponse:
+    response: FastAPIResponse = create_k8s_deployment(
+        im_url=payload.im_url,
+        im_access_token=payload.im_access_token,
+        iaas_access_token=payload.iaas_access_token,
+        tosca_template=payload.tosca_template,
+        provider_name=payload.provider_name,
+        provider_endpoint=payload.provider_endpoint,
+        provider_type=payload.provider_type)
 
-    jwt = request.headers.get("authorization").replace("Bearer ","")
-
-    raw_body = await request.body()
-    tosca_template = raw_body.decode()
-
-    status = create_k8s_deployment(im_url, jwt, tosca_template)
-
-    return status
+    return response
