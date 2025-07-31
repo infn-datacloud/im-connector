@@ -10,7 +10,7 @@ from flaat.exceptions import FlaatUnauthenticated
 from flaat.fastapi import Flaat
 from flaat.user_infos import UserInfos
 
-from config import (
+from im_connector.config import (
     AuthenticationMethodsEnum,
     AuthorizationMethodsEnum,
     Settings,
