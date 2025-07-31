@@ -27,7 +27,7 @@ def get_logger(settings: Settings) -> logging.Logger:
     stream_handler = logging.StreamHandler()
     stream_handler.setFormatter(formatter)
 
-    logger = logging.getLogger("orchestrator-api")
+    logger = logging.getLogger("orchestrator-im-connector")
     logger.setLevel(level=settings.LOG_LEVEL)
     logger.addHandler(stream_handler)
 
