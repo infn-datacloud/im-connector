@@ -117,6 +117,10 @@ def proxy(request: FastAPIRquest, path: str):
     url = f"{SettingsDep.IM_HOST}/infrastructures/{path}"
 
     try:
+
+        if path in LOCAL_ROUTES:
+            return LOCAL_ROUTES[path](request)
+        
         body = request.body()
         excluded_headers = {"host", "content-length", "connection"}
         headers = {k: v for k, v in request.headers.items() if k.lower() not in excluded_headers}
