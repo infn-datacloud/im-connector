@@ -120,7 +120,7 @@ def proxy(request: FastAPIRquest, path: str):
 
         if path in LOCAL_ROUTES:
             return LOCAL_ROUTES[path](request)
-        
+
         body = request.body()
         excluded_headers = {"host", "content-length", "connection"}
         headers = {k: v for k, v in request.headers.items() if k.lower() not in excluded_headers}
@@ -142,13 +142,15 @@ def proxy(request: FastAPIRquest, path: str):
         )
 
     except requests.exceptions.RequestException as exc:
-        print(f"❌ Error connecting backend: {exc}")
+        logger = get_logger(settings)
+        logger.error(f"❌ Error connecting backend: {exc}")
         return FastAPIJSONResponse(
             status_code=502,
             content={"error": f"Error connecting backend: {str(exc)}"},
         )
     except Exception as exc:
-        print(f"🔥 Internal Proxy error: {exc}")
+        logger = get_logger(settings)
+        logger.error(f"🔥 Internal Proxy error: {exc}")
         return FastAPIJSONResponse(
             status_code=500,
             content={"error": f"IM Proxy internal error: {str(exc)}"},
