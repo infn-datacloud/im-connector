@@ -92,36 +92,49 @@ async def create_kubernetes_deployment(payload: DeploymentCreate, credentials: H
 
 # IM proxy REST interface
 
-# 🔹 Registry demo local handlers
+# 🔹 Demo local handlers
 def local_status_handler(request: FastAPIRquest):
     return FastAPIJSONResponse({"service": "proxy", "status": "ok"}, status_code=200)
 
 def healthcheck_handler(request: FastAPIRquest):
     return FastAPIJSONResponse({"health": "green", "uptime": "12345s"}, status_code=200)
 
+
 # local paths map for demo, put here actual paths
 LOCAL_ROUTES = {
-    "infrastructures/proxylocalstatus": local_status_handler,
-    "infrastructures/proxyhealthcheck": healthcheck_handler,
+    "proxylocalstatus": local_status_handler,
+    "proxyhealthcheck": healthcheck_handler,
 }
+
+
+@app.api_route("/infrastructures",
+    methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"],
+    summary = "Proxy interface to IM",
+    description = "Proxy interface to IM"
+)
+async def proxy_infrastructures_root(request: FastAPIRquest):
+    return await forward_request(request, "infrastructures")
 
 
 @app.api_route("/infrastructures/{path:path}",
     methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"],
-    summary = "Proxy interface to IM",
-    description = "Proxy interface to IM",
-    dependencies = [Security(check_authorization)]
+               summary="Proxy interface to IM (with subpath)",
+               description="Proxy interface to IM (with subpath)"
 )
-def proxy(request: FastAPIRquest, path: str):
+async def proxy_infrastructures_sub(request: FastAPIRquest, path: str):
+    return await forward_request(request, f"infrastructures/{path}")
 
-    url = f"{SettingsDep.IM_HOST}/infrastructures/{path}"
+
+async def forward_request(request: FastAPIRquest, path: str):
+
+    url = f"{settings.IM_HOST.rstrip('/')}/{path.lstrip('/')}" if path else settings.IM_HOST.rstrip('/')
 
     try:
 
         if path in LOCAL_ROUTES:
             return LOCAL_ROUTES[path](request)
 
-        body = request.body()
+        body = await request.body()
         excluded_headers = {"host", "content-length", "connection"}
         headers = {k: v for k, v in request.headers.items() if k.lower() not in excluded_headers}
 
