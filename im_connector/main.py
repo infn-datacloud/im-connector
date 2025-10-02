@@ -4,11 +4,14 @@ This module sets up the FastAPI application, configures middleware, authenticati
 and provides endpoints to interact with IM.
 """
 
+import requests
+
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Security
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import Response as FastAPIResponse
+from fastapi.responses import Response as FastAPIResponse, JSONResponse as FastAPIJSONResponse
+from fastapi.requests import  Request as FastAPIRquest
 
 from im_connector.im import create_k8s_deployment
 from im_connector.models import DeploymentCreate
@@ -85,3 +88,84 @@ async def create_kubernetes_deployment(payload: DeploymentCreate, credentials: H
         provider_type=payload.provider_type)
 
     return response
+
+
+# IM proxy REST interface
+
+# 🔹 Demo local handlers
+def local_status_handler(request: FastAPIRquest):
+    return FastAPIJSONResponse({"service": "proxy", "status": "ok"}, status_code=200)
+
+def healthcheck_handler(request: FastAPIRquest):
+    return FastAPIJSONResponse({"health": "green", "uptime": "12345s"}, status_code=200)
+
+
+# local paths map for demo, put here actual paths
+LOCAL_ROUTES = {
+    "proxylocalstatus": local_status_handler,
+    "proxyhealthcheck": healthcheck_handler,
+}
+
+
+@app.api_route("/infrastructures",
+    methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"],
+    summary = "Proxy interface to IM",
+    description = "Proxy interface to IM"
+)
+async def proxy_infrastructures_root(request: FastAPIRquest):
+    return await forward_request(request, "infrastructures")
+
+
+@app.api_route("/infrastructures/{path:path}",
+    methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"],
+               summary="Proxy interface to IM (with subpath)",
+               description="Proxy interface to IM (with subpath)"
+)
+async def proxy_infrastructures_sub(request: FastAPIRquest, path: str):
+    return await forward_request(request, f"infrastructures/{path}")
+
+
+async def forward_request(request: FastAPIRquest, path: str):
+
+    url = f"{settings.IM_HOST.rstrip('/')}/{path.lstrip('/')}" if path else settings.IM_HOST.rstrip('/')
+
+    try:
+
+        if path in LOCAL_ROUTES:
+            return LOCAL_ROUTES[path](request)
+
+        body = await request.body()
+        excluded_headers = {"host", "content-length", "connection"}
+        headers = {k: v for k, v in request.headers.items() if k.lower() not in excluded_headers}
+
+        backend_response = requests.request(
+            method=request.method,
+            url=url,
+            params=request.query_params,
+            data=body,
+            headers=headers,
+            timeout=30.0,
+        )
+
+        return FastAPIResponse(
+            content=backend_response.content,
+            status_code=backend_response.status_code,
+            headers=dict(backend_response.headers),
+            media_type=backend_response.headers.get("content-type")
+        )
+
+    except requests.exceptions.RequestException as exc:
+        logger = get_logger(settings)
+        logger.error(f"❌ Error connecting backend: {exc}")
+        return FastAPIJSONResponse(
+            status_code=502,
+            content={"error": f"Error connecting backend: {str(exc)}"},
+        )
+    except Exception as exc:
+        logger = get_logger(settings)
+        logger.error(f"🔥 Internal Proxy error: {exc}")
+        return FastAPIJSONResponse(
+            status_code=500,
+            content={"error": f"IM Proxy internal error: {str(exc)}"},
+        )
+
