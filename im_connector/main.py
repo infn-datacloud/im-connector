@@ -12,12 +12,15 @@ from fastapi import FastAPI, Security
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response as FastAPIResponse, JSONResponse as FastAPIJSONResponse
 from fastapi.requests import  Request as FastAPIRquest
+from starlette.datastructures import Headers
 
 from im_connector.im import create_k8s_deployment
 from im_connector.models import DeploymentCreate
 from im_connector.auth import check_authorization, configure_flaat, HttpAuthzCredsDep
 from im_connector.config import get_settings, SettingsDep
 from im_connector.logger import get_logger
+from im_library.client.im_client import IMClient
+from im_library.client.im_request_adapter import IMRequestAdapter
 
 settings = get_settings()
 
@@ -70,42 +73,7 @@ app.add_middleware(
 )
 
 
-@app.post(
-    "/api/v1/deployments",
-    summary="Create Kubernetes Deployment",
-    description="Given a TOSCA template, trigger the InfrastructureManager to create a Kubernetes deployment",
-    dependencies=[Security(check_authorization)]
-)
-async def create_kubernetes_deployment(payload: DeploymentCreate, credentials: HttpAuthzCredsDep,
-                                       app_settings: SettingsDep) -> FastAPIResponse:
-    response: FastAPIResponse = create_k8s_deployment(
-        im_url=payload.im_url,
-        im_access_token=payload.im_access_token,
-        iaas_access_token=payload.iaas_access_token,
-        tosca_template=payload.tosca_template,
-        provider_name=payload.provider_name,
-        provider_endpoint=payload.provider_endpoint,
-        provider_type=payload.provider_type)
-
-    return response
-
-
 # IM proxy REST interface
-
-# 🔹 Demo local handlers
-def local_status_handler(request: FastAPIRquest):
-    return FastAPIJSONResponse({"service": "proxy", "status": "ok"}, status_code=200)
-
-def healthcheck_handler(request: FastAPIRquest):
-    return FastAPIJSONResponse({"health": "green", "uptime": "12345s"}, status_code=200)
-
-
-# local paths map for demo, put here actual paths
-LOCAL_ROUTES = {
-    "proxylocalstatus": local_status_handler,
-    "proxyhealthcheck": healthcheck_handler,
-}
-
 
 @app.api_route("/infrastructures",
     methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"],
@@ -126,26 +94,11 @@ async def proxy_infrastructures_sub(request: FastAPIRquest, path: str):
 
 
 async def forward_request(request: FastAPIRquest, path: str):
-
     url = f"{settings.IM_HOST.rstrip('/')}/{path.lstrip('/')}" if path else settings.IM_HOST.rstrip('/')
 
     try:
-
-        if path in LOCAL_ROUTES:
-            return LOCAL_ROUTES[path](request)
-
-        body = await request.body()
-        excluded_headers = {"host", "content-length", "connection"}
-        headers = {k: v for k, v in request.headers.items() if k.lower() not in excluded_headers}
-
-        backend_response = requests.request(
-            method=request.method,
-            url=url,
-            params=request.query_params,
-            data=body,
-            headers=headers,
-            timeout=30.0,
-        )
+        adapter = IMRequestAdapter(request)
+        backend_response = IMClient.request(adapter.request, adapter.header)
 
         return FastAPIResponse(
             content=backend_response.content,
