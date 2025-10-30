@@ -1,9 +1,10 @@
 import requests
 
-from im_connector.main import settings
+from im_connector.config import get_settings
 from im_library.client.im_base_requests import IMBaseRequest
 from im_library.header.im_header_composer import IMHeaderComposer
 
+settings = get_settings()
 
 class IMClient:
     @classmethod

@@ -6,7 +6,7 @@ from im_library.header.im_header_component_base import IMHeaderComponentBase
 class OpenStackHeaderComponent(IMHeaderComponentBase):
     def __init__(self, *,
                  id: str = "os",
-                 type: str = "OpenStack",
+                 type: str = "openstack",
                  username: Optional[str] = None,
                  password: Optional[str] = None,
                  host: Optional[str] = None,

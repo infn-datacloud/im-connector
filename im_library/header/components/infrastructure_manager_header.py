@@ -6,7 +6,7 @@ from im_library.header.im_header_component_base import IMHeaderComponentBase
 class InfrastructureManagerHeaderComponent(IMHeaderComponentBase):
     def __init__(self, *,
                  id: str = "im",
-                 type: str = "InfrastructureManager",
+                 type: str = "infrastructuremanager",
                  username: Optional[str] = None,
                  password: Optional[str] = None,
                  host: Optional[str] = None,

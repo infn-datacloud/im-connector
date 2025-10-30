@@ -6,7 +6,7 @@ from im_library.header.im_header_component_base import IMHeaderComponentBase
 class KubernetesHeaderComponent(IMHeaderComponentBase):
     def __init__(self, *,
                  id: str = "kub",
-                 type: str = "Kubernetes",
+                 type: str = "kubernetes",
                  username: Optional[str] = None,
                  password: Optional[str] = None,
                  host: Optional[str] = None,
