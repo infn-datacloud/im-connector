@@ -8,19 +8,16 @@ import requests
 
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Security
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response as FastAPIResponse, JSONResponse as FastAPIJSONResponse
 from fastapi.requests import  Request as FastAPIRquest
-from starlette.datastructures import Headers
 
-from im_connector.im import create_k8s_deployment
-from im_connector.models import DeploymentCreate
-from im_connector.auth import check_authorization, configure_flaat, HttpAuthzCredsDep
-from im_connector.config import get_settings, SettingsDep
+from im_connector.auth import configure_flaat
+from im_connector.config import get_settings
 from im_connector.logger import get_logger
 from im_library.client.im_client import IMClient
-from im_library.client.im_request_adapter import IMRequestAdapter
+from im_library.adapter.im_request_adapter import IMRequestAdapter
 
 settings = get_settings()
 

@@ -18,3 +18,5 @@ class IMClient:
             headers=header.headers,
             timeout=30.0,
         )
+
+        return backend_response
