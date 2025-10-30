@@ -1,24 +1,19 @@
-import re
-from typing import Optional, Callable
+from typing import Callable
 
 from fastapi.requests import Request as FastAPIRequest
 
 from im_library.adapter.im_endpoint_map import IMEndpointMap
 from im_library.client.base_requests import IMBaseRequest
-from im_library.client.im_requests.create_infrastructure import CreateInfrastructure, \
-    CreateInfrastructureQueryParameters
-from im_library.client.im_requests.list_user_infrastructures import ListUserInfrastructures, \
-    ListUserInfrastructuresQueryParameters
+from im_library.client.im_requests.create_infrastructure import CreateInfrastructure
+from im_library.client.im_requests.list_user_infrastructures import ListUserInfrastructures
 from im_library.client.query_parameters_base import QueryParametersBase
 from im_library.entities.enums.cloud_provider_type import CloudProviderType
 from im_library.entities.enums.im_request_type import IMRequestType
 from im_library.header.IMHeaderComponentBase import IMHeaderComponentBase
-from im_library.header.composers.infrastructure_manager_header import InfrastructureManagerHeaderComponent
-from im_library.header.composers.kubernetes_header import KubernetesHeaderComponent
-from im_library.header.composers.openstack_header import OpenStackHeaderComponent
+from im_library.header.components.infrastructure_manager_header import InfrastructureManagerHeaderComponent
+from im_library.header.components.kubernetes_header import KubernetesHeaderComponent
+from im_library.header.components.openstack_header import OpenStackHeaderComponent
 from im_library.header.header_composer import HeaderComposer
-
-
 
 
 class IMRequestAdapter:

@@ -1,5 +1,3 @@
-from typing import Optional
-
 from im_library.client.base_requests import Post
 from im_library.client.query_parameters_base import QueryParametersBase
 from im_library.entities.enums.im_request_type import IMRequestType
