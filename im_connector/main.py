@@ -87,7 +87,7 @@ async def proxy_infrastructures_root(request: FastAPIRequest):
                summary="Proxy interface to IM (with subpath)",
                description="Proxy interface to IM (with subpath)"
 )
-async def proxy_infrastructures_sub(request: FastAPIRequest, path: str):
+async def proxy_infrastructures_sub(request: FastAPIRequest):
     return await forward_request(request)
 
 

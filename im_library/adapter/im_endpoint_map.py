@@ -83,7 +83,7 @@ class IMEndpointMap:
             else:
                 raise ValueError(f"Method {method} not implemented for path {path}")
         else:
-            raise ValueError(f"Unkown request type for path {path}")
+            raise ValueError(f"Unknown request type for path {path}")
 
         return request_type
 
