@@ -4,20 +4,21 @@ This module sets up the FastAPI application, configures middleware, authenticati
 and provides endpoints to interact with IM.
 """
 
-import requests
-
 from contextlib import asynccontextmanager
 
+import requests
 from fastapi import FastAPI
+from fastapi import HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import Response as FastAPIResponse, JSONResponse as FastAPIJSONResponse
-from fastapi.requests import  Request as FastAPIRquest
+from fastapi.requests import Request as FastAPIRequest
+from fastapi.responses import JSONResponse as FastAPIJSONResponse
 
 from im_connector.auth import configure_flaat
 from im_connector.config import get_settings
+from im_connector.fastapi_response_wrapper import FastAPIResponseWrapper
 from im_connector.logger import get_logger
-from im_library.client.im_client import IMClient
 from im_library.adapter.im_request_adapter import IMRequestAdapter
+from im_library.client.im_client import IMClient
 
 settings = get_settings()
 
@@ -77,7 +78,7 @@ app.add_middleware(
     summary = "Proxy interface to IM",
     description = "Proxy interface to IM"
 )
-async def proxy_infrastructures_root(request: FastAPIRquest):
+async def proxy_infrastructures_root(request: FastAPIRequest):
     return await forward_request(request)
 
 
@@ -86,22 +87,23 @@ async def proxy_infrastructures_root(request: FastAPIRquest):
                summary="Proxy interface to IM (with subpath)",
                description="Proxy interface to IM (with subpath)"
 )
-async def proxy_infrastructures_sub(request: FastAPIRquest, path: str):
+async def proxy_infrastructures_sub(request: FastAPIRequest, path: str):
     return await forward_request(request)
 
 
-async def forward_request(request: FastAPIRquest):
+async def forward_request(request: FastAPIRequest):
     try:
         adapter = IMRequestAdapter(request)
-        backend_response = IMClient.request(adapter.request, adapter.header)
+        try:
+            backend_response = IMClient.request(adapter.request, adapter.header)
+        except Exception as e:
+            # Relaying the exception to ensure consistency with FastAPI data types
+            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=e)
 
-        return FastAPIResponse(
-            content=backend_response.content,
-            status_code=backend_response.status_code,
-            headers=dict(backend_response.headers),
-            media_type=backend_response.headers.get("content-type")
-        )
+        if not backend_response.ok:
+            raise HTTPException(status_code=backend_response.status_code, detail=backend_response.reason)
 
+        return FastAPIResponseWrapper(backend_response)
     except requests.exceptions.RequestException as exc:
         logger = get_logger(settings)
         logger.error(f"Error connecting backend: {exc}")

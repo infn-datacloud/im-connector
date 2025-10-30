@@ -2,7 +2,7 @@ import requests
 from fastapi.responses import Response as FastAPIResponse
 
 
-class FastAPIResponseMapper(FastAPIResponse):
+class FastAPIResponseWrapper(FastAPIResponse):
     def __init__(self, response: requests.Response):
         super().__init__(content=response.content,
                          status_code=response.status_code,
