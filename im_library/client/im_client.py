@@ -1,13 +1,13 @@
 import requests
 
 from im_connector.main import settings
-from im_library.client.base_requests import IMBaseRequest
-from im_library.header.header_composer import HeaderComposer
+from im_library.client.im_base_requests import IMBaseRequest
+from im_library.header.im_header_composer import IMHeaderComposer
 
 
 class IMClient:
     @classmethod
-    def request(cls, request: IMBaseRequest, header: HeaderComposer):
+    def request(cls, request: IMBaseRequest, header: IMHeaderComposer):
         url = f"{settings.IM_HOST}{request.url}"
 
         backend_response = requests.request(

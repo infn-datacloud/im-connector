@@ -1,6 +1,6 @@
 from typing import Optional
 
-from im_library.header.IMHeaderComponentBase import IMHeaderComponentBase
+from im_library.header.im_header_component_base import IMHeaderComponentBase
 
 
 class KubernetesHeaderComponent(IMHeaderComponentBase):

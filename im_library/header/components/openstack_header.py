@@ -1,12 +1,12 @@
 from typing import Optional
 
-from im_library.header.IMHeaderComponentBase import IMHeaderComponentBase
+from im_library.header.im_header_component_base import IMHeaderComponentBase
 
 
 class OpenStackHeaderComponent(IMHeaderComponentBase):
     def __init__(self, *,
-                 id: str,
-                 type: str,
+                 id: str = "os",
+                 type: str = "OpenStack",
                  username: Optional[str] = None,
                  password: Optional[str] = None,
                  host: Optional[str] = None,

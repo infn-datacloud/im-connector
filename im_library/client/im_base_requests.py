@@ -1,17 +1,17 @@
 import abc
 from typing import Optional
 
-from im_library.client.query_parameters_base import QueryParametersBase
+from im_library.client.im_query_parameters_base import IMQueryParametersBase
 from im_library.entities.enums.im_request_type import IMRequestType
 
 
 class IMBaseRequest(metaclass=abc.ABCMeta):
     def __init__(self, *,
                  path_parameters: Optional[dict] = None,
-                 query_parameters: Optional[QueryParametersBase] = None,
+                 query_parameters: Optional[IMQueryParametersBase] = None,
                  body: str = ""):
         self._path_parameters: dict = {} if path_parameters is None else path_parameters
-        self._query_parameters: QueryParametersBase = query_parameters
+        self._query_parameters: IMQueryParametersBase = query_parameters
         self._body: str = body
 
     @property

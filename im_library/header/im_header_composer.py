@@ -1,8 +1,8 @@
 from im_library.entities.enums.cloud_provider_type import CloudProviderType
-from im_library.header.IMHeaderComponentBase import IMHeaderComponentBase
+from im_library.header.im_header_component_base import IMHeaderComponentBase
 
 
-class HeaderComposer:
+class IMHeaderComposer:
     def __init__(self):
         self._headers: list[IMHeaderComponentBase] = []
 
