@@ -78,7 +78,7 @@ app.add_middleware(
     description = "Proxy interface to IM"
 )
 async def proxy_infrastructures_root(request: FastAPIRquest):
-    return await forward_request(request, "infrastructures")
+    return await forward_request(request)
 
 
 @app.api_route("/infrastructures/{path:path}",
@@ -87,12 +87,10 @@ async def proxy_infrastructures_root(request: FastAPIRquest):
                description="Proxy interface to IM (with subpath)"
 )
 async def proxy_infrastructures_sub(request: FastAPIRquest, path: str):
-    return await forward_request(request, f"infrastructures/{path}")
+    return await forward_request(request)
 
 
-async def forward_request(request: FastAPIRquest, path: str):
-    url = f"{settings.IM_HOST.rstrip('/')}/{path.lstrip('/')}" if path else settings.IM_HOST.rstrip('/')
-
+async def forward_request(request: FastAPIRquest):
     try:
         adapter = IMRequestAdapter(request)
         backend_response = IMClient.request(adapter.request, adapter.header)
@@ -106,14 +104,14 @@ async def forward_request(request: FastAPIRquest, path: str):
 
     except requests.exceptions.RequestException as exc:
         logger = get_logger(settings)
-        logger.error(f"❌ Error connecting backend: {exc}")
+        logger.error(f"Error connecting backend: {exc}")
         return FastAPIJSONResponse(
             status_code=502,
             content={"error": f"Error connecting backend: {str(exc)}"},
         )
     except Exception as exc:
         logger = get_logger(settings)
-        logger.error(f"🔥 Internal Proxy error: {exc}")
+        logger.error(f"Internal Proxy error: {exc}")
         return FastAPIJSONResponse(
             status_code=500,
             content={"error": f"IM Proxy internal error: {str(exc)}"},

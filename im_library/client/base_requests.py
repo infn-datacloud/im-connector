@@ -1,13 +1,23 @@
 import abc
 from typing import Optional
 
+from im_library.client.query_parameters_base import QueryParametersBase
+from im_library.entities.enums.im_request_type import IMRequestType
+
 
 class IMBaseRequest(metaclass=abc.ABCMeta):
-    def __init__(self, *, query_parameters: Optional[dict] = None, body: str = "",
-                 path_parameters: Optional[dict] = None):
-        self._parameters: Optional[dict] = query_parameters
+    def __init__(self, *,
+                 path_parameters: Optional[dict] = None,
+                 query_parameters: Optional[QueryParametersBase] = None,
+                 body: str = ""):
+        self._path_parameters: dict = {} if path_parameters is None else path_parameters
+        self._query_parameters: QueryParametersBase = query_parameters
         self._body: str = body
-        self._path_parameters: Optional[dict] = path_parameters
+
+    @property
+    @abc.abstractmethod
+    def request_type(self) -> IMRequestType:
+        ...
 
     @property
     @abc.abstractmethod
@@ -15,13 +25,13 @@ class IMBaseRequest(metaclass=abc.ABCMeta):
         ...
 
     @property
-    @abc.abstractmethod
     def url(self) -> str:
-        ...
+        url_template = self.request_type.value
+        return url_template.format(**self._path_parameters)
 
     @property
-    def parameters(self) -> dict[str, str]:
-        return self._parameters
+    def query_parameters(self) -> dict[str, str]:
+        return self._query_parameters
 
     @property
     def body(self) -> str:

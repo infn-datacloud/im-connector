@@ -2,6 +2,15 @@ import re
 
 from im_library.entities.enums.im_request_type import IMRequestType
 
+
+def swagger_endpoint_to_regex(swagger_path: str) -> re.Pattern:
+    """Convert a Swagger-like path (with {param}) into a regex pattern."""
+    regex = re.escape(swagger_path)
+    regex = regex.replace(r'\{', '{').replace(r'\}', '}')
+    regex = re.sub(r'\{[^/}]+\}', r'[^/]+', regex)
+    return re.compile(f'^{regex}/?$')  # allow optional trailing slash
+
+
 class IMEndpointMap:
     _endpoint_patterns = {
         "/version": IMRequestType.VERSION,
@@ -30,21 +39,12 @@ class IMEndpointMap:
         "/oai": IMRequestType.GET_OAI_PMH_TOSCA_INFO
     }
 
-    @staticmethod
-    def _swagger_endpoint_to_regex(swagger_path: str) -> re.Pattern:
-        """Convert a Swagger-like path (with {param}) into a regex pattern."""
-        regex = re.escape(swagger_path)
-        regex = regex.replace(r'\{', '{').replace(r'\}', '}')
-        regex = re.sub(r'\{[^/}]+\}', r'[^/]+', regex)
-        return re.compile(f'^{regex}/?$')  # allow optional trailing slash
+    _compiled_patterns = {swagger_endpoint_to_regex(k): v for k, v in _endpoint_patterns.items()}
 
-    @property
-    def _compiled_patterns(self) -> dict:
-        return {self._swagger_endpoint_to_regex(k): v for k, v in IMEndpointMap._endpoint_patterns.items()}
-
-    def identify_request_type(self, path: str, method: str) -> IMRequestType:
+    @classmethod
+    def identify_request_type(cls, path: str, method: str) -> IMRequestType:
         request_type: IMRequestType = IMRequestType.NONE
-        for regex, enum_value in self._compiled_patterns.items():
+        for regex, enum_value in IMEndpointMap._compiled_patterns.items():
             if regex.match(path):
                 request_type = enum_value
 
@@ -87,10 +87,9 @@ class IMEndpointMap:
 
         return request_type
 
-    @staticmethod
-    def extract_path_params(path: str) -> dict:
+    @classmethod
+    def extract_path_params(cls, path: str) -> dict:
         for pattern in IMEndpointMap._endpoint_patterns.keys():
-            # Convert the pattern with {Var} into a regex with named groups (?P<Var>[^/]+)
             regex_pattern = re.sub(r"\{(\w+)\}", r"(?P<\1>[^/]+)", pattern)
             regex_pattern = f"^{regex_pattern}$"
             match = re.match(regex_pattern, path)

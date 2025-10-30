@@ -13,9 +13,9 @@ class IMClient:
         backend_response = requests.request(
             method=request.method,
             url=url,
-            params=request.parameters,
+            params=request.query_parameters,
             data=request.body,
-            headers=header.headers,
+            headers=header.get_header(),
             timeout=30.0,
         )
 

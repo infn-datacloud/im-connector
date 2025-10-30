@@ -5,8 +5,11 @@ from fastapi.requests import Request as FastAPIRequest
 
 from im_library.adapter.im_endpoint_map import IMEndpointMap
 from im_library.client.base_requests import IMBaseRequest
-from im_library.client.im_requests.create_infrastructure import CreateInfrastructure
-from im_library.client.im_requests.list_user_infrastructures import ListUserInfrastructures
+from im_library.client.im_requests.create_infrastructure import CreateInfrastructure, \
+    CreateInfrastructureQueryParameters
+from im_library.client.im_requests.list_user_infrastructures import ListUserInfrastructures, \
+    ListUserInfrastructuresQueryParameters
+from im_library.client.query_parameters_base import QueryParametersBase
 from im_library.entities.enums.cloud_provider_type import CloudProviderType
 from im_library.entities.enums.im_request_type import IMRequestType
 from im_library.header.IMHeaderComponentBase import IMHeaderComponentBase
@@ -31,14 +34,13 @@ class IMRequestAdapter:
     }
 
     def __init__(self, request: FastAPIRequest):
-        endpoint_map: IMEndpointMap = IMEndpointMap()
         self._method = request.method.lower()
-        self._query_parameters = request.query_params
-        self._path_parameters = endpoint_map.extract_path_params(request.url.path)
+        self._query_parameters: QueryParametersBase = QueryParametersBase(**request.query_params)
+        self._path_parameters = IMEndpointMap.extract_path_params(request.url.path)
         self._body = self._extract_body(request)
         self._auth_header_dict: list[dict[str, str]] = self._parse_im_auth_header(request.headers["Authorization"])
         self._header_composer: HeaderComposer = self._populate_header_composer()
-        self._im_request_type: IMRequestType = endpoint_map.identify_request_type(request.url.path, request.method)
+        self._im_request_type: IMRequestType = IMEndpointMap.identify_request_type(request.url.path, request.method)
 
     @staticmethod
     async def _extract_body(request: FastAPIRequest):
