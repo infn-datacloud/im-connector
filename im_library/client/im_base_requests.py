@@ -1,15 +1,20 @@
 import abc
-from typing import Optional
+import dataclasses
+from typing import Optional, Union
 
+from im_library.client.im_path_parameters_base import IMPathParametersBase
 from im_library.client.im_query_parameters_base import IMQueryParametersBase
 
 
 class IMBaseRequest(metaclass=abc.ABCMeta):
     def __init__(self, *,
-                 path_parameters: Optional[dict] = None,
+                 path_parameters: Optional[IMPathParametersBase] = None,
                  query_parameters: Optional[IMQueryParametersBase] = None,
                  body: str = ""):
-        self._path_parameters: dict = {} if path_parameters is None else path_parameters
+        if path_parameters is None:
+            self._path_parameters: dict = {}
+        elif isinstance(path_parameters, IMPathParametersBase):
+            self._path_parameters: dict = dataclasses.asdict(path_parameters)
         self._query_parameters: IMQueryParametersBase = query_parameters
         self._body: str = body
 

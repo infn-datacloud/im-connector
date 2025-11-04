@@ -1,3 +1,5 @@
+from typing import Optional
+
 from im_library.client.im_base_requests import Post
 from im_library.client.im_query_parameters_base import IMQueryParametersBase
 
@@ -8,6 +10,10 @@ class CreateInfrastructureQueryParameters(IMQueryParametersBase):
 
 
 class CreateInfrastructure(Post):
+    def __init__(self, *, body: str,
+                 query_parameters: Optional[CreateInfrastructureQueryParameters] = None):
+        super().__init__(body=body, query_parameters=query_parameters)
+
     @property
     def _url_template(self) -> str:
         return "/infrastructures"

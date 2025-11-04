@@ -5,8 +5,10 @@ from typing_extensions import Any
 
 from im_library.adapter.im_endpoint_map import IMEndpointMap
 from im_library.client.im_base_requests import IMBaseRequest
+from im_library.client.im_path_parameters_base import IMPathParametersBase
 from im_library.client.im_query_parameters_base import IMQueryParametersBase
 from im_library.client.im_requests.create_infrastructure import CreateInfrastructure
+from im_library.client.im_requests.import_infrastructure import ImportInfrastructure
 from im_library.client.im_requests.list_user_infrastructures import ListUserInfrastructures
 from im_library.entities.enums.cloud_provider_type import CloudProviderType
 from im_library.entities.enums.im_request_type import IMRequestType
@@ -26,7 +28,8 @@ class IMRequestAdapter:
 
     _im_request_map: dict[IMRequestType, Callable[..., IMBaseRequest]] = {
         IMRequestType.LIST_USER_INFRASTRUCTURES: lambda *a, **kw: ListUserInfrastructures(*a, **kw),
-        IMRequestType.CREATE_INFRASTRUCTURE: lambda *a, **kw: CreateInfrastructure(*a, **kw)
+        IMRequestType.CREATE_INFRASTRUCTURE: lambda *a, **kw: CreateInfrastructure(*a, **kw),
+        IMRequestType.IMPORT_INFRASTRUCTURE: lambda *a, **kw: ImportInfrastructure(*a, **kw),
     }
 
     def __init__(self, request: FastAPIRequest, request_body: Any):
@@ -64,8 +67,9 @@ class IMRequestAdapter:
 
     @property
     def request(self) -> IMBaseRequest:
+        path_parameters: IMPathParametersBase = IMPathParametersBase(**self._path_parameters)
         return IMRequestAdapter._im_request_map[self._im_request_type](query_parameters=self._query_parameters,
-                                                                       path_parameters=self._path_parameters,
+                                                                       path_parameters=path_parameters,
                                                                        body=self._body)
 
     @property
