@@ -1,6 +1,7 @@
 import dataclasses
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(kw_only=True)
 class IMPathParametersBase:
-    pass
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)

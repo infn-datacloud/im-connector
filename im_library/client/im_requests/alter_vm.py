@@ -1,7 +1,10 @@
+import dataclasses
+
 from im_library.client.im_base_requests import Put
 from im_library.client.im_path_parameters_base import IMPathParametersBase
 
 
+@dataclasses.dataclass(kw_only=True)
 class AlterVMPathParameters(IMPathParametersBase):
     InfId: str
     VMId: str

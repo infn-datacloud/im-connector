@@ -1,3 +1,4 @@
+import dataclasses
 from typing import Optional
 
 from im_library.client.im_base_requests import Post
@@ -10,6 +11,7 @@ class AddResourcesToInfrastructureQueryParameters(IMQueryParametersBase):
         super().__init__(context=context)
 
 
+@dataclasses.dataclass(kw_only=True)
 class AddResourceToInfrastructurePathParameters(IMPathParametersBase):
     InfId: str
 

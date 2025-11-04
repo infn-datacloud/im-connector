@@ -1,3 +1,4 @@
+import dataclasses
 from typing import Optional
 
 from im_library.client.im_base_requests import Put
@@ -10,6 +11,7 @@ class CreateDiskSnapshotQueryParameters(IMQueryParametersBase):
         super().__init__(image_name=image_name, auto_delete=auto_delete)
 
 
+@dataclasses.dataclass(kw_only=True)
 class CreateDiskSnapshotPathParameters(IMPathParametersBase):
     InfId: str
     VMId: str

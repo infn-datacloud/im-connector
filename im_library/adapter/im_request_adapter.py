@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Callable, Optional
 
 from fastapi.requests import Request as FastAPIRequest
 from typing_extensions import Any
@@ -30,6 +30,12 @@ class IMRequestAdapter:
         IMRequestType.LIST_USER_INFRASTRUCTURES: lambda *a, **kw: ListUserInfrastructures(*a, **kw),
         IMRequestType.CREATE_INFRASTRUCTURE: lambda *a, **kw: CreateInfrastructure(*a, **kw),
         IMRequestType.IMPORT_INFRASTRUCTURE: lambda *a, **kw: ImportInfrastructure(*a, **kw),
+    }
+
+    _im_path_parameters_map: dict[IMRequestType, Optional[Callable[..., IMPathParametersBase]]] = {
+        IMRequestType.LIST_USER_INFRASTRUCTURES: None,
+        IMRequestType.CREATE_INFRASTRUCTURE: None,
+        IMRequestType.IMPORT_INFRASTRUCTURE: None,
     }
 
     def __init__(self, request: FastAPIRequest, request_body: Any):
@@ -67,9 +73,13 @@ class IMRequestAdapter:
 
     @property
     def request(self) -> IMBaseRequest:
-        path_parameters: IMPathParametersBase = IMPathParametersBase(**self._path_parameters)
+        path_parameters = IMRequestAdapter._im_path_parameters_map[self._im_request_type]
+        if path_parameters is not None:
+            path_parameters_dataclass: Optional[IMPathParametersBase] = path_parameters(**self._path_parameters)
+        else:
+            path_parameters_dataclass : Optional[IMPathParametersBase] = None
         return IMRequestAdapter._im_request_map[self._im_request_type](query_parameters=self._query_parameters,
-                                                                       path_parameters=path_parameters,
+                                                                       path_parameters=path_parameters_dataclass,
                                                                        body=self._body)
 
     @property

@@ -1,3 +1,4 @@
+import dataclasses
 from typing import Optional
 
 from im_library.client.im_base_requests import Delete
@@ -10,6 +11,7 @@ class DeleteInfrastructureQueryParameters(IMQueryParametersBase):
         super().__init__(force=force, async_=async_)
 
 
+@dataclasses.dataclass(kw_only=True)
 class DeleteInfrastructurePathParameters(IMPathParametersBase):
     InfId: str
 
