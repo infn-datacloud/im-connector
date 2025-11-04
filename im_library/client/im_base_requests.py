@@ -2,7 +2,6 @@ import abc
 from typing import Optional
 
 from im_library.client.im_query_parameters_base import IMQueryParametersBase
-from im_library.entities.enums.im_request_type import IMRequestType
 
 
 class IMBaseRequest(metaclass=abc.ABCMeta):
@@ -16,7 +15,7 @@ class IMBaseRequest(metaclass=abc.ABCMeta):
 
     @property
     @abc.abstractmethod
-    def request_type(self) -> IMRequestType:
+    def _url_template(self) -> str:
         ...
 
     @property
@@ -26,8 +25,7 @@ class IMBaseRequest(metaclass=abc.ABCMeta):
 
     @property
     def url(self) -> str:
-        url_template = self.request_type.value
-        return url_template.format(**self._path_parameters)
+        return self._url_template.format(**self._path_parameters)
 
     @property
     def query_parameters(self) -> dict[str, str]:

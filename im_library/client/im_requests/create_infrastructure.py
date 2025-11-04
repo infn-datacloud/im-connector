@@ -1,6 +1,5 @@
 from im_library.client.im_base_requests import Post
 from im_library.client.im_query_parameters_base import IMQueryParametersBase
-from im_library.entities.enums.im_request_type import IMRequestType
 
 
 class CreateInfrastructureQueryParameters(IMQueryParametersBase):
@@ -10,5 +9,5 @@ class CreateInfrastructureQueryParameters(IMQueryParametersBase):
 
 class CreateInfrastructure(Post):
     @property
-    def request_type(self) -> IMRequestType:
-        return IMRequestType.CREATE_INFRASTRUCTURE
+    def _url_template(self) -> str:
+        return "/infrastructures"

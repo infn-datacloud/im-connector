@@ -1,18 +1,19 @@
 from typing import Callable
 
 from fastapi.requests import Request as FastAPIRequest
+from typing_extensions import Any
 
 from im_library.adapter.im_endpoint_map import IMEndpointMap
 from im_library.client.im_base_requests import IMBaseRequest
+from im_library.client.im_query_parameters_base import IMQueryParametersBase
 from im_library.client.im_requests.create_infrastructure import CreateInfrastructure
 from im_library.client.im_requests.list_user_infrastructures import ListUserInfrastructures
-from im_library.client.im_query_parameters_base import IMQueryParametersBase
 from im_library.entities.enums.cloud_provider_type import CloudProviderType
 from im_library.entities.enums.im_request_type import IMRequestType
-from im_library.header.im_header_component_base import IMHeaderComponentBase
 from im_library.header.components.infrastructure_manager_header import InfrastructureManagerHeaderComponent
 from im_library.header.components.kubernetes_header import KubernetesHeaderComponent
 from im_library.header.components.openstack_header import OpenStackHeaderComponent
+from im_library.header.im_header_component_base import IMHeaderComponentBase
 from im_library.header.im_header_composer import IMHeaderComposer
 
 
@@ -28,25 +29,19 @@ class IMRequestAdapter:
         IMRequestType.CREATE_INFRASTRUCTURE: lambda *a, **kw: CreateInfrastructure(*a, **kw)
     }
 
-    def __init__(self, request: FastAPIRequest):
-        self._method = request.method.lower()
+    def __init__(self, request: FastAPIRequest, request_body: Any):
         self._query_parameters: IMQueryParametersBase = IMQueryParametersBase(**request.query_params)
         self._path_parameters = IMEndpointMap.extract_path_params(request.url.path)
-        self._body = self._extract_body(request)
-        self._auth_header_dict: list[dict[str, str]] = self._parse_im_auth_header(request.headers["Authorization"])
-        self._header_composer: IMHeaderComposer = self._populate_header_composer()
+        self._body = request_body
+        self._header_composer: IMHeaderComposer = self._populate_header_composer(request.headers)
         self._im_request_type: IMRequestType = IMEndpointMap.identify_request_type(request.url.path, request.method)
-
-    @staticmethod
-    async def _extract_body(request: FastAPIRequest):
-        return await request.body()
 
     @staticmethod
     def _parse_im_auth_header(header_string: str) -> list[dict[str, str]]:
         lines = [line.strip() for line in header_string.split("\\n") if line.strip()]
         result = []
         for line in lines:
-            pairs = [p.strip() for p in line.split(" ; ") if p.strip()]
+            pairs = [p.strip() for p in line.split(";") if p.strip()]
             entry = {}
             for pair in pairs:
                 if " = " in pair:
@@ -55,12 +50,16 @@ class IMRequestAdapter:
             result.append(entry)
         return result
 
-    def _populate_header_composer(self) -> IMHeaderComposer:
+    def _populate_header_composer(self, headers) -> IMHeaderComposer:
+        auth_header_dict: list[dict[str, str]] = self._parse_im_auth_header(headers["Authorization"])
         composer = IMHeaderComposer()
-        for cred in self._auth_header_dict:
+        for cred in auth_header_dict:
             provider_type: CloudProviderType = CloudProviderType(cred["type"])
             header: IMHeaderComponentBase = IMRequestAdapter._headers[provider_type](**cred)
             composer.add_credential(header)
+        for header_name, header_value in headers.items():
+            if header_name.lower() != "authorization":
+                composer.add_header(header_name, header_value)
         return composer
 
     @property

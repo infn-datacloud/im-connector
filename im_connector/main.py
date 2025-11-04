@@ -93,7 +93,8 @@ async def proxy_infrastructures_sub(request: FastAPIRequest):
 
 async def forward_request(request: FastAPIRequest):
     try:
-        adapter = IMRequestAdapter(request)
+        request_body = await request.body()
+        adapter = IMRequestAdapter(request, request_body)
         try:
             backend_response = IMClient.request(adapter.request, adapter.header)
         except Exception as e:

@@ -49,36 +49,36 @@ class IMEndpointMap:
                 request_type = enum_value
 
         if request_type is IMRequestType.INFRASTRUCTURE_CHECK_METHOD:
-            if method == "get":
+            if method == "GET":
                 request_type = IMRequestType.LIST_USER_INFRASTRUCTURES
-            elif method == "post":
+            elif method == "POST":
                 request_type = IMRequestType.CREATE_INFRASTRUCTURE
-            elif method == "put":
+            elif method == "PUT":
                 request_type = IMRequestType.IMPORT_INFRASTRUCTURE
             else:
                 raise ValueError(f"Method {method} not implemented for path {path}")
         elif request_type is IMRequestType.INFID_CHECK_METHOD:
-            if method == "get":
+            if method == "GET":
                 request_type = IMRequestType.LIST_INFRASTRUCTURE_VMS
-            elif method == "post":
+            elif method == "POST":
                 request_type = IMRequestType.ADD_RESOURCES_TO_INFRASTRUCTURE
-            elif method == "delete":
+            elif method == "DELETE":
                 request_type = IMRequestType.DELETE_INFRASTRUCTURE
             else:
                 raise ValueError(f"Method {method} not implemented for path {path}")
         elif request_type is IMRequestType.AUTH_CHECK_METHOD:
-            if method == "get":
+            if method == "GET":
                 request_type = IMRequestType.GET_INFRASTRUCTURE_OWNERS_LIST
-            elif method == "post":
+            elif method == "POST":
                 request_type = IMRequestType.CHANGE_INFRASTRUCTURE_AUTHORIZATION_DATA
             else:
                 raise ValueError(f"Method {method} not implemented for path {path}")
         elif request_type is IMRequestType.VMS_CHECK_METHOD:
-            if method == "get":
+            if method == "GET":
                 request_type = IMRequestType.GET_VM_INFO
-            elif method == "put":
+            elif method == "PUT":
                 request_type = IMRequestType.ALTER_VM
-            elif method == "delete":
+            elif method == "DELETE":
                 request_type = IMRequestType.DELETE_VM
             else:
                 raise ValueError(f"Method {method} not implemented for path {path}")
