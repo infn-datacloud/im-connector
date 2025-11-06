@@ -7,6 +7,7 @@ WORKDIR /app
 
 COPY ./pyproject.toml ./poetry.lock ./README.md /app/
 COPY ./im_connector ./im_connector
+COPY ./im_library ./im_library
 
 RUN poetry install --without dev
 
