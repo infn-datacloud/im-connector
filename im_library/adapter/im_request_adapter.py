@@ -4,7 +4,7 @@ from fastapi.requests import Request as FastAPIRequest
 from typing_extensions import Any
 
 from im_connector.config import get_settings
-from im_connector.logger import get_logger
+from im_library.logging.logger import get_logger
 from im_library.adapter.im_endpoint_map import IMEndpointMap
 from im_library.client.im_requests.add_resources_to_infrastructure import AddResourceToInfrastructurePathParameters, \
     AddResourcesToInfrastructure, AddResourcesToInfrastructureQueryParameters

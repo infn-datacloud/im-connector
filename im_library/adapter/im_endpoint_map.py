@@ -3,7 +3,7 @@ import re
 from starlette.datastructures import QueryParams
 
 from im_connector.config import get_settings
-from im_connector.logger import get_logger
+from im_library.logging.logger import get_logger
 from im_library.entities.enums.im_request_type import IMRequestType
 
 

@@ -1,12 +1,13 @@
 import requests
 
 from im_connector.config import get_settings
-from im_connector.logger import get_logger
 from im_library.entities.im_base_requests import IMBaseRequest
 from im_library.header.im_header_composer import IMHeaderComposer
+from im_library.logging.logger import get_logger
 
 settings = get_settings()
 logger = get_logger(settings)
+
 
 class IMClient:
     @classmethod

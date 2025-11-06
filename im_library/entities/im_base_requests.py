@@ -2,7 +2,7 @@ import abc
 from typing import Optional
 
 from im_connector.config import get_settings
-from im_connector.logger import get_logger
+from im_library.logging.logger import get_logger
 from im_library.entities.im_request_parameters import IMPathParametersBase, IMQueryParametersBase
 
 
