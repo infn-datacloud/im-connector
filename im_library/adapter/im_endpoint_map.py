@@ -2,7 +2,13 @@ import re
 
 from starlette.datastructures import QueryParams
 
+from im_connector.config import get_settings
+from im_connector.logger import get_logger
 from im_library.entities.enums.im_request_type import IMRequestType
+
+
+settings = get_settings()
+logger = get_logger(settings)
 
 
 def swagger_endpoint_to_regex(swagger_path: str) -> re.Pattern:
@@ -87,6 +93,7 @@ class IMEndpointMap:
         elif request_type is IMRequestType.NONE:
             raise ValueError(f"Unknown request type for path {path}")
 
+        logger.info(f"[ENDPOINT_MAP]: identified request type: {request_type}.")
         return request_type
 
     @classmethod

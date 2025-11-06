@@ -1,15 +1,19 @@
 import requests
 
 from im_connector.config import get_settings
+from im_connector.logger import get_logger
 from im_library.entities.im_base_requests import IMBaseRequest
 from im_library.header.im_header_composer import IMHeaderComposer
 
 settings = get_settings()
+logger = get_logger(settings)
 
 class IMClient:
     @classmethod
     def request(cls, request: IMBaseRequest, header: IMHeaderComposer):
         url = f"{settings.IM_HOST}{request.url}"
+
+        logger.info(f"[CLIENT]: forwarding request to IM at URL: {url}.")
 
         backend_response = requests.request(
             method=request.method,

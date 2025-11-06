@@ -3,6 +3,8 @@ from typing import Callable, Optional
 from fastapi.requests import Request as FastAPIRequest
 from typing_extensions import Any
 
+from im_connector.config import get_settings
+from im_connector.logger import get_logger
 from im_library.adapter.im_endpoint_map import IMEndpointMap
 from im_library.client.im_requests.add_resources_to_infrastructure import AddResourceToInfrastructurePathParameters, \
     AddResourcesToInfrastructure, AddResourcesToInfrastructureQueryParameters
@@ -63,9 +65,11 @@ from im_library.header.credential_components.infrastructure_manager_credential i
     InfrastructureManagerCredentialComponent
 from im_library.header.credential_components.kubernetes_credential import KubernetesCredentialComponent
 from im_library.header.credential_components.openstack_credential import OpenStackCredentialComponent
-from im_library.header.im_header_component_base import IMCredentialComponentBase
+from im_library.header.im_credential_component_base import IMCredentialComponentBase
 from im_library.header.im_header_composer import IMHeaderComposer
 
+settings = get_settings()
+logger = get_logger(settings)
 
 class IMRequestAdapter:
     _headers: dict[CloudProviderType, Callable[..., IMCredentialComponentBase]] = {
@@ -195,6 +199,7 @@ class IMRequestAdapter:
                     key, val = pair.split(" = ", 1)
                     entry[key.strip()] = val.strip().strip("'\"")
             result.append(entry)
+        logger.info(f"[ADAPTER]: identified credentials for {[x["type"] for x in result]}.")
         return result
 
     def _populate_header_composer(self, headers) -> IMHeaderComposer:
@@ -226,6 +231,7 @@ class IMRequestAdapter:
             query_parameters_dataclass: Optional[IMQueryParametersBase] = query_parameters(**self._query_parameters)
             request_args["query_parameters"] = query_parameters_dataclass
 
+        logger.info(f"[ADAPTER]: request type {self._im_request_type} requirese these arguments: {request_args.keys()}.")
         return IMRequestAdapter._im_request_map[self._im_request_type](**request_args)
 
     @property

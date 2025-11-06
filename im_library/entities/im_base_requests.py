@@ -1,7 +1,13 @@
 import abc
 from typing import Optional
 
+from im_connector.config import get_settings
+from im_connector.logger import get_logger
 from im_library.entities.im_request_parameters import IMPathParametersBase, IMQueryParametersBase
+
+
+settings = get_settings()
+logger = get_logger(settings)
 
 
 class IMBaseRequest(metaclass=abc.ABCMeta):
@@ -12,7 +18,7 @@ class IMBaseRequest(metaclass=abc.ABCMeta):
         self._path_parameters: Optional[IMPathParametersBase] = path_parameters
         self._query_parameters: Optional[IMQueryParametersBase] = query_parameters
         self._body: str = body
-        print(f"{type(self).__name__} - {self._path_parameters} - {self._query_parameters}", flush=True)
+        logger.info(f"[REQUEST] - Created request  {type(self).__name__}.")
 
     @property
     @abc.abstractmethod

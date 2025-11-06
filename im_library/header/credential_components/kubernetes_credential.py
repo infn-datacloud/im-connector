@@ -1,12 +1,12 @@
 from typing import Optional
 
-from im_library.header.im_header_component_base import IMCredentialComponentBase
+from im_library.header.im_credential_component_base import IMCredentialComponentBase
 
 
 class KubernetesCredentialComponent(IMCredentialComponentBase):
     def __init__(self, *,
                  id: str = "kub",
-                 type: str = "kubernetes",
+                 type: str = "Kubernetes",
                  username: Optional[str] = None,
                  password: Optional[str] = None,
                  host: Optional[str] = None,

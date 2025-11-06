@@ -95,14 +95,14 @@ async def forward_request(request: FastAPIRequest):
     try:
         request_body = await request.body()
         adapter = IMRequestAdapter(request, request_body)
-        # try:
-        backend_response = IMClient.request(adapter.request, adapter.header)
-        # except Exception as e:
-        #     # Relaying the exception to ensure consistency with FastAPI data types
-        #     raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=e)
-        #
-        # if not backend_response.ok:
-        #     raise HTTPException(status_code=backend_response.status_code, detail=backend_response.reason)
+        try:
+         backend_response = IMClient.request(adapter.request, adapter.header)
+        except Exception as e:
+            # Relaying the exception to ensure consistency with FastAPI data types
+            raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=e)
+
+        if not backend_response.ok:
+            raise HTTPException(status_code=backend_response.status_code, detail=backend_response.reason)
 
         return FastAPIResponseWrapper(backend_response)
     except requests.exceptions.RequestException as exc:
