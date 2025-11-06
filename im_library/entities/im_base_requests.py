@@ -1,9 +1,7 @@
 import abc
-import dataclasses
-from typing import Optional, Union
+from typing import Optional
 
-from im_library.client.im_path_parameters_base import IMPathParametersBase
-from im_library.client.im_query_parameters_base import IMQueryParametersBase
+from im_library.entities.im_request_parameters import IMPathParametersBase, IMQueryParametersBase
 
 
 class IMBaseRequest(metaclass=abc.ABCMeta):
@@ -11,12 +9,10 @@ class IMBaseRequest(metaclass=abc.ABCMeta):
                  path_parameters: Optional[IMPathParametersBase] = None,
                  query_parameters: Optional[IMQueryParametersBase] = None,
                  body: str = ""):
-        if path_parameters is None:
-            self._path_parameters: dict = {}
-        elif isinstance(path_parameters, IMPathParametersBase):
-            self._path_parameters: dict = dataclasses.asdict(path_parameters)
-        self._query_parameters: IMQueryParametersBase = query_parameters
+        self._path_parameters: Optional[IMPathParametersBase] = path_parameters
+        self._query_parameters: Optional[IMQueryParametersBase] = query_parameters
         self._body: str = body
+        print(f"{type(self).__name__} - {self._path_parameters} - {self._query_parameters}", flush=True)
 
     @property
     @abc.abstractmethod
@@ -30,11 +26,13 @@ class IMBaseRequest(metaclass=abc.ABCMeta):
 
     @property
     def url(self) -> str:
-        return self._url_template.format(**self._path_parameters)
+        path_parameters = self._path_parameters.to_dict() if self._path_parameters is not None else {}
+        rendered_url = self._url_template.format(**path_parameters)
+        return rendered_url
 
     @property
     def query_parameters(self) -> dict[str, str]:
-        return self._query_parameters
+        return self._query_parameters.to_dict() if self._query_parameters is not None else None
 
     @property
     def body(self) -> str:

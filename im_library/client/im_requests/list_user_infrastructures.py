@@ -1,13 +1,20 @@
-from im_library.client.im_base_requests import Get
-from im_library.client.im_query_parameters_base import IMQueryParametersBase
+import dataclasses
+from typing import Optional
+
+from im_library.entities.im_base_requests import Get
+from im_library.entities.im_request_parameters import IMQueryParametersBase
 
 
+@dataclasses.dataclass()
 class ListUserInfrastructuresQueryParameters(IMQueryParametersBase):
-    def __init__(self, *, filter: str):
-        super().__init__(filter=filter)
+    filter: str = ""
 
 
 class ListUserInfrastructures(Get):
+    def __init__(self, *,
+                 query_parameters: Optional[ListUserInfrastructuresQueryParameters] = None):
+        super().__init__(query_parameters=query_parameters)
+
     @property
     def _url_template(self) -> str:
         return "/infrastructures"

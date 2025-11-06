@@ -1,14 +1,13 @@
 import dataclasses
 from typing import Optional
 
-from im_library.client.im_base_requests import Post
-from im_library.client.im_path_parameters_base import IMPathParametersBase
-from im_library.client.im_query_parameters_base import IMQueryParametersBase
+from im_library.entities.im_base_requests import Post
+from im_library.entities.im_request_parameters import IMQueryParametersBase, IMPathParametersBase
 
 
+@dataclasses.dataclass(kw_only=True)
 class ChangeInfrastructureAuthorizationDataQueryParameters(IMQueryParametersBase):
-    def __init__(self, *, overwrite: str = "false"):
-        super().__init__(overwrite=overwrite)
+    overwrite: str = "false"
 
 
 @dataclasses.dataclass(kw_only=True)

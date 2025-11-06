@@ -1,16 +1,19 @@
+import dataclasses
 from typing import Optional
 
-from im_library.client.im_base_requests import Post
-from im_library.client.im_query_parameters_base import IMQueryParametersBase
+from im_library.entities.im_base_requests import Post
+from im_library.entities.im_request_parameters import IMQueryParametersBase
 
 
+@dataclasses.dataclass(kw_only=True)
 class CreateInfrastructureQueryParameters(IMQueryParametersBase):
-    def __init__(self, *, async_: str = "false", dry_run: str = "false"):
-        super().__init__(async_=async_, dry_run=dry_run)
+    async_: str = "false"
+    dry_run: str = "false"
 
 
 class CreateInfrastructure(Post):
-    def __init__(self, *, body: str,
+    def __init__(self, *,
+                 body: str,
                  query_parameters: Optional[CreateInfrastructureQueryParameters] = None):
         super().__init__(body=body, query_parameters=query_parameters)
 

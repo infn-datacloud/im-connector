@@ -4,7 +4,7 @@ from typing import Optional
 from im_library.entities.enums.cloud_provider_type import CloudProviderType
 
 
-class IMHeaderComponentBase(metaclass=abc.ABCMeta):
+class IMCredentialComponentBase(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def __init__(self, *,
                  id: str,

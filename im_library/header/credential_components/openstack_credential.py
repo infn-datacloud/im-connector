@@ -1,9 +1,9 @@
 from typing import Optional
 
-from im_library.header.im_header_component_base import IMHeaderComponentBase
+from im_library.header.im_header_component_base import IMCredentialComponentBase
 
 
-class OpenStackHeaderComponent(IMHeaderComponentBase):
+class OpenStackCredentialComponent(IMCredentialComponentBase):
     def __init__(self, *,
                  id: str = "os",
                  type: str = "openstack",

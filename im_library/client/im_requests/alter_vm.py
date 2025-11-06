@@ -1,7 +1,7 @@
 import dataclasses
 
-from im_library.client.im_base_requests import Put
-from im_library.client.im_path_parameters_base import IMPathParametersBase
+from im_library.entities.im_base_requests import Put
+from im_library.entities.im_request_parameters import IMPathParametersBase
 
 
 @dataclasses.dataclass(kw_only=True)

@@ -1,5 +1,7 @@
 import re
 
+from starlette.datastructures import QueryParams
+
 from im_library.entities.enums.im_request_type import IMRequestType
 
 
@@ -82,7 +84,7 @@ class IMEndpointMap:
                 request_type = IMRequestType.DELETE_VM
             else:
                 raise ValueError(f"Method {method} not implemented for path {path}")
-        else:
+        elif request_type is IMRequestType.NONE:
             raise ValueError(f"Unknown request type for path {path}")
 
         return request_type
@@ -96,3 +98,13 @@ class IMEndpointMap:
             if match:
                 return match.groupdict()  # dict of {param_name: value}
         return {}
+
+    @classmethod
+    def sanitize_query_params(cls, query: QueryParams) -> dict:
+        sanitized_query_params = {}
+        for k, v in query.items():
+            if k in {"async"}:
+                sanitized_query_params[k + "_"] = v
+            else:
+                sanitized_query_params[k] = v
+        return sanitized_query_params
