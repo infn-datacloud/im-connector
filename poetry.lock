@@ -491,17 +491,6 @@ files = [
     {file = "filelock-3.19.1.tar.gz", hash = "sha256:66eda1888b0171c998b35be2bcc0f6d75c388a7ce20c3f3f37aa8e96c2dddf58"},
 ]
 
-[[package]]
-name = "flaat"
-version = "1.2.0"
-description = "User authorization for OIDC authenticated python web APIs."
-optional = false
-python-versions = "*"
-groups = ["main"]
-files = [
-    {file = "flaat-1.2.0.tar.gz", hash = "sha256:8a2e756e07edf6728ff963b7f6de6676338f44ec09ec6de816a159d01eccc893"},
-]
-
 [package.dependencies]
 aarc-entitlement = "==1.*"
 cachetools = "==5.*"

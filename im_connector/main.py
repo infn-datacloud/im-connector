@@ -13,7 +13,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.requests import Request as FastAPIRequest
 from fastapi.responses import JSONResponse as FastAPIJSONResponse
 
-from im_connector.auth import configure_flaat
 from im_connector.config import get_settings
 from im_connector.fastapi_response_wrapper import FastAPIResponseWrapper
 from im_connector.logger import get_logger
@@ -30,22 +29,20 @@ docs_url = "/docs"
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(fastapi_app: FastAPI):
     """FastAPI application lifespan context manager.
 
     This function is called at application startup and shutdown. It performs:
     - Initializes the application logger and attaches it to the request state.
-    - Configures authentication/authorization (Flaat).
 
     Args:
-        app: The FastAPI application instance.
+        fastapi_app: The FastAPI application instance.
 
     Yields:
         dict: A dictionary with the logger instance, available in the request state.
 
     """
     logger = get_logger(settings)
-    configure_flaat(settings, logger)
     yield {"logger": logger}
 
 
@@ -65,7 +62,7 @@ app.add_middleware(
     allow_origins=[
         str(origin).rstrip("/") for origin in settings.ALLOWED_ORIGINS
     ],  # or ["*"] to allow all origins
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
