@@ -16,8 +16,8 @@ from fastapi.responses import JSONResponse as FastAPIJSONResponse
 from im_connector.config import get_settings
 from im_connector.fastapi_response_wrapper import FastAPIResponseWrapper
 from im_connector.logger import get_logger
-from im_library.adapter.im_request_adapter import IMRequestAdapter
-from im_library.client.im_client import IMClient
+from im_connector.im_library import IMRequestAdapter
+from im_connector.im_library import IMClient
 
 settings = get_settings()
 
