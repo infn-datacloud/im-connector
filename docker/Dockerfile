@@ -5,7 +5,7 @@ FROM harbor.cloud.infn.it/datacloud-middleware/poetry:${POETRY_VERSION}-python${
 
 WORKDIR /app
 
-COPY ./pyproject.toml ./poetry.lock ./README.md ./.env /app/
+COPY ./pyproject.toml ./poetry.lock ./README.md /app/
 COPY ./im_connector ./im_connector
 COPY ./im_library ./im_library
 
