@@ -1,5 +1,5 @@
 from im_connector.im_library.entities.enums.cloud_provider_type import CloudProviderType
-from im_connector.im_library.header.im_credential_component_base import IMCredentialComponentBase
+from im_connector.im_library.entities.im_credential_component_base import IMCredentialComponentBase
 
 
 class IMHeaderComposer:
