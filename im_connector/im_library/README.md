@@ -30,29 +30,29 @@ The Adapter identifies:
 
 The Adapter's output consists of two properties:
 
-- `request`,  containing the request object;
+- `request`, containing the request object;
 - `header`, providing a composer class to serialize the request header.
 
 ## IM Client
 
-The actual IM Client consists of a single class method called `IMClient.request()`. This methods is a wrapper to a `requests.request` call and accepts a `IMBaseRequest` and `IMHeaderComposer` instances as input. These base objects contain all the information to submit the request to the actual IM.
+The actual IM Client consists of a single class method called `IMClient.request()`. This method is a wrapper to a `requests.request` call and accepts am `IMBaseRequest` and an `IMHeaderComposer` instances as input. These base objects contain all the information to submit the request to the actual IM.
 
 The `IMClient.request()` method returns the IM response.
 
 ### Request types
 
-All requests are represented by objects inheriting from `IMBaseReuqest`. This abstract class define:
+All requests are represented by objects inheriting from `IMBaseReuqest`. This abstract class defines:
 
 - the HTTP method;
 - the endpoint URL;
 - the query parameters;
 - the request body.
 
-Requests are grouped by HTTP method. Five partial classes are defined: `Get`, `Post`, `Put`, `Patch` and `delete`.
+Requests are grouped by HTTP method. Five partial classes are defined: `Get`, `Post`, `Put`, `Patch` and `Delete`.
 
 Actual requests inherit from one of these partial classes.
 
-Thorough type hints guide the user in the object creation pocess.
+Thorough type hints guide the user in the object creation process.
 
 ### Credential header components
 
