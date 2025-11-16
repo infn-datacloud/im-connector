@@ -71,19 +71,17 @@ app.add_middleware(
 # IM proxy REST interface
 
 @app.api_route("/infrastructures",
-    methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"],
-    summary = "Proxy interface to IM",
-    description = "Proxy interface to IM"
-)
+               methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"],
+               summary="Proxy interface to IM",
+               description="Proxy interface to IM")
 async def proxy_infrastructures_root(request: FastAPIRequest):
     return await forward_request(request)
 
 
 @app.api_route("/infrastructures/{path:path}",
-    methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"],
+               methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"],
                summary="Proxy interface to IM (with subpath)",
-               description="Proxy interface to IM (with subpath)"
-)
+               description="Proxy interface to IM (with subpath)")
 async def proxy_infrastructures_sub(request: FastAPIRequest):
     return await forward_request(request)
 
@@ -93,7 +91,7 @@ async def forward_request(request: FastAPIRequest):
         request_body = await request.body()
         adapter = IMRequestAdapter(request, request_body)
         try:
-         backend_response = IMClient.request(adapter.request, adapter.header)
+            backend_response = IMClient.request(adapter.request, adapter.header)
         except Exception as e:
             # Relaying the exception to ensure consistency with FastAPI data types
             raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=e)
@@ -116,4 +114,3 @@ async def forward_request(request: FastAPIRequest):
             status_code=500,
             content={"error": f"IM Proxy internal error: {str(exc)}"},
         )
-

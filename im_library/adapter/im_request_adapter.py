@@ -4,7 +4,6 @@ from fastapi.requests import Request as FastAPIRequest
 from typing_extensions import Any
 
 from im_connector.config import get_settings
-from im_library.logging.logger import get_logger
 from im_library.adapter.im_endpoint_map import IMEndpointMap
 from im_library.client.im_requests.add_resources_to_infrastructure import AddResourceToInfrastructurePathParameters, \
     AddResourcesToInfrastructure, AddResourcesToInfrastructureQueryParameters
@@ -67,9 +66,11 @@ from im_library.header.credential_components.kubernetes_credential import Kubern
 from im_library.header.credential_components.openstack_credential import OpenStackCredentialComponent
 from im_library.header.im_credential_component_base import IMCredentialComponentBase
 from im_library.header.im_header_composer import IMHeaderComposer
+from im_library.logging.logger import get_logger
 
 settings = get_settings()
 logger = get_logger(settings)
+
 
 class IMRequestAdapter:
     _headers: dict[CloudProviderType, Callable[..., IMCredentialComponentBase]] = {
@@ -81,7 +82,8 @@ class IMRequestAdapter:
     _im_request_map: dict[IMRequestType, Callable[..., IMBaseRequest]] = {
         IMRequestType.ADD_RESOURCES_TO_INFRASTRUCTURE: lambda **kw: AddResourcesToInfrastructure(**kw),
         IMRequestType.ALTER_VM: lambda **kw: AlterVM(**kw),
-        IMRequestType.CHANGE_INFRASTRUCTURE_AUTHORIZATION_DATA: lambda **kw: ChangeInfrastructureAuthorizationData(**kw),
+        IMRequestType.CHANGE_INFRASTRUCTURE_AUTHORIZATION_DATA: lambda **kw: ChangeInfrastructureAuthorizationData(
+            **kw),
         IMRequestType.CREATE_DISK_SNAPSHOT: lambda **kw: CreateDiskSnapshot(**kw),
         IMRequestType.CREATE_INFRASTRUCTURE: lambda **kw: CreateInfrastructure(**kw),
         IMRequestType.DELETE_INFRASTRUCTURE: lambda **kw: DeleteInfrastructure(**kw),
@@ -90,10 +92,11 @@ class IMRequestAdapter:
         IMRequestType.GET_CLOUD_PROVIDER_AVAILABLE_IMAGES_LIST: lambda **kw: GetCloudProviderAvailableImagesList(**kw),
         IMRequestType.GET_CLOUD_PROVIDER_USER_QUOTAS: lambda **kw: GetCloudProviderUserQuotas(**kw),
         IMRequestType.GET_IM_SERVER_STATS: lambda **kw: GetIMServerStats(**kw),
-        IMRequestType.GET_INFRASTRUCTURE_CONTEXTUALIZATION_MESSAGE: lambda **kw: GetInfrastructureContextualizationMessage(**kw),
+        IMRequestType.GET_INFRASTRUCTURE_CONTEXTUALIZATION_MESSAGE: lambda
+            **kw: GetInfrastructureContextualizationMessage(**kw),
         IMRequestType.GET_INFRASTRUCTURE_CREATION_RADL: lambda **kw: GetInfrastructureCreationRadl(**kw),
         IMRequestType.GET_INFRASTRUCTURE_OUTPUTS: lambda **kw: GetInfrastructureOutputs(**kw),
-        IMRequestType.GET_INFRASTRUCTURE_OWNERS_LIST: lambda **kw:GetInfrastructureOwnersList (**kw),
+        IMRequestType.GET_INFRASTRUCTURE_OWNERS_LIST: lambda **kw: GetInfrastructureOwnersList(**kw),
         IMRequestType.GET_INFRASTRUCTURE_STATE: lambda **kw: GetInfrastructureState(**kw),
         IMRequestType.GET_INFRASTRUCTURE_TOSCA_REPRESENTATION: lambda **kw: GetInfrastructureToscaRepresentation(**kw),
         IMRequestType.GET_OAI_PMH_TOSCA_INFO: lambda **kw: GetOAIPMHToscaInfo(**kw),
@@ -115,21 +118,25 @@ class IMRequestAdapter:
     _im_path_parameters_map: dict[IMRequestType, Optional[Callable[..., IMPathParametersBase]]] = {
         IMRequestType.ADD_RESOURCES_TO_INFRASTRUCTURE: lambda **kw: AddResourceToInfrastructurePathParameters(**kw),
         IMRequestType.ALTER_VM: lambda **kw: AlterVMPathParameters(**kw),
-        IMRequestType.CHANGE_INFRASTRUCTURE_AUTHORIZATION_DATA: lambda **kw: ChangeInfrastructureAuthorizationDataPathParameters(**kw),
+        IMRequestType.CHANGE_INFRASTRUCTURE_AUTHORIZATION_DATA: lambda
+            **kw: ChangeInfrastructureAuthorizationDataPathParameters(**kw),
         IMRequestType.CREATE_DISK_SNAPSHOT: lambda **kw: CreateDiskSnapshotPathParameters(**kw),
         IMRequestType.CREATE_INFRASTRUCTURE: None,
         IMRequestType.DELETE_INFRASTRUCTURE: lambda **kw: DeleteInfrastructurePathParameters(**kw),
         IMRequestType.DELETE_VM: lambda **kw: DeleteVMPathParameters(**kw),
         IMRequestType.EXPORT_INFRASTRUCTURE: lambda **kw: ExportInfrastructurePathParameters(**kw),
-        IMRequestType.GET_CLOUD_PROVIDER_AVAILABLE_IMAGES_LIST: lambda **kw: GetCloudProviderAvailableImagesListPathParameters(**kw),
+        IMRequestType.GET_CLOUD_PROVIDER_AVAILABLE_IMAGES_LIST: lambda
+            **kw: GetCloudProviderAvailableImagesListPathParameters(**kw),
         IMRequestType.GET_CLOUD_PROVIDER_USER_QUOTAS: lambda **kw: GetCloudProviderUserQuotasPathParameters(**kw),
         IMRequestType.GET_IM_SERVER_STATS: None,
-        IMRequestType.GET_INFRASTRUCTURE_CONTEXTUALIZATION_MESSAGE: lambda **kw: GetInfrastructureContextualizationMessagePathParameters(**kw),
+        IMRequestType.GET_INFRASTRUCTURE_CONTEXTUALIZATION_MESSAGE: lambda
+            **kw: GetInfrastructureContextualizationMessagePathParameters(**kw),
         IMRequestType.GET_INFRASTRUCTURE_CREATION_RADL: lambda **kw: GetInfrastructureCreationRadlPathParameters(**kw),
         IMRequestType.GET_INFRASTRUCTURE_OUTPUTS: lambda **kw: GetInfrastructureOutputsPathParameters(**kw),
         IMRequestType.GET_INFRASTRUCTURE_OWNERS_LIST: lambda **kw: GetInfrastructureOwnersListPathParameters(**kw),
         IMRequestType.GET_INFRASTRUCTURE_STATE: lambda **kw: GetInfrastructureStatePathParameters(**kw),
-        IMRequestType.GET_INFRASTRUCTURE_TOSCA_REPRESENTATION: lambda **kw: GetInfrastructureToscaRepresentationPathParameters(**kw),
+        IMRequestType.GET_INFRASTRUCTURE_TOSCA_REPRESENTATION: lambda
+            **kw: GetInfrastructureToscaRepresentationPathParameters(**kw),
         IMRequestType.GET_OAI_PMH_TOSCA_INFO: None,
         IMRequestType.GET_VM_CONTEXTUALIZATION_MESSAGE: lambda **kw: GetVMContextualizationMessagePathParameters(**kw),
         IMRequestType.GET_VM_INFO: lambda **kw: GetVMInfoPathParameters(**kw),
@@ -149,16 +156,19 @@ class IMRequestAdapter:
     _im_query_parameters_map: dict[IMRequestType, Optional[Callable[..., IMQueryParametersBase]]] = {
         IMRequestType.ADD_RESOURCES_TO_INFRASTRUCTURE: lambda **kw: AddResourcesToInfrastructureQueryParameters(**kw),
         IMRequestType.ALTER_VM: None,
-        IMRequestType.CHANGE_INFRASTRUCTURE_AUTHORIZATION_DATA: lambda **kw: ChangeInfrastructureAuthorizationDataQueryParameters(**kw),
+        IMRequestType.CHANGE_INFRASTRUCTURE_AUTHORIZATION_DATA: lambda
+            **kw: ChangeInfrastructureAuthorizationDataQueryParameters(**kw),
         IMRequestType.CREATE_DISK_SNAPSHOT: lambda **kw: CreateDiskSnapshotQueryParameters(**kw),
         IMRequestType.CREATE_INFRASTRUCTURE: lambda **kw: CreateInfrastructureQueryParameters(**kw),
         IMRequestType.DELETE_INFRASTRUCTURE: lambda **kw: DeleteInfrastructureQueryParameters(**kw),
         IMRequestType.DELETE_VM: None,
         IMRequestType.EXPORT_INFRASTRUCTURE: lambda **kw: ExportInfrastructureQueryParameters(**kw),
-        IMRequestType.GET_CLOUD_PROVIDER_AVAILABLE_IMAGES_LIST: lambda **kw: GetCloudProviderAvailableImagesListQueryParameters(**kw),
+        IMRequestType.GET_CLOUD_PROVIDER_AVAILABLE_IMAGES_LIST: lambda
+            **kw: GetCloudProviderAvailableImagesListQueryParameters(**kw),
         IMRequestType.GET_CLOUD_PROVIDER_USER_QUOTAS: None,
         IMRequestType.GET_IM_SERVER_STATS: lambda **kw: GetIMServerStatsQueryParameters(**kw),
-        IMRequestType.GET_INFRASTRUCTURE_CONTEXTUALIZATION_MESSAGE: lambda **kw: GetInfrastructureContextualizationMessageQueryParameters(**kw),
+        IMRequestType.GET_INFRASTRUCTURE_CONTEXTUALIZATION_MESSAGE: lambda
+            **kw: GetInfrastructureContextualizationMessageQueryParameters(**kw),
         IMRequestType.GET_INFRASTRUCTURE_CREATION_RADL: None,
         IMRequestType.GET_INFRASTRUCTURE_OUTPUTS: None,
         IMRequestType.GET_INFRASTRUCTURE_OWNERS_LIST: None,
@@ -231,7 +241,8 @@ class IMRequestAdapter:
             query_parameters_dataclass: Optional[IMQueryParametersBase] = query_parameters(**self._query_parameters)
             request_args["query_parameters"] = query_parameters_dataclass
 
-        logger.info(f"[ADAPTER]: request type {self._im_request_type} requirese these arguments: {request_args.keys()}.")
+        logger.info(
+            f"[ADAPTER]: request type {self._im_request_type} requirese these arguments: {request_args.keys()}.")
         return IMRequestAdapter._im_request_map[self._im_request_type](**request_args)
 
     @property
