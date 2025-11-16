@@ -3,7 +3,7 @@ from typing import Optional
 
 from im_connector.config import get_settings
 from im_connector.im_library.entities.im_request_parameters import IMPathParametersBase, IMQueryParametersBase
-from im_connector.im_library.logging.logger import get_logger
+from im_connector.logger import get_logger
 
 settings = get_settings()
 logger = get_logger(settings)

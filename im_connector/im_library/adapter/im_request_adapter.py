@@ -66,7 +66,7 @@ from im_connector.im_library.header.credential_components.kubernetes_credential 
 from im_connector.im_library.header.credential_components.openstack_credential import OpenStackCredentialComponent
 from im_connector.im_library.header.im_credential_component_base import IMCredentialComponentBase
 from im_connector.im_library.header.im_header_composer import IMHeaderComposer
-from im_connector.im_library.logging.logger import get_logger
+from im_connector.logger import get_logger
 
 settings = get_settings()
 logger = get_logger(settings)
