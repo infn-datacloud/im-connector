@@ -69,6 +69,7 @@ app.add_middleware(
 
 
 # IM proxy REST interface
+# All IM REST API endpoints are defined here: https://app.swaggerhub.com/apis-docs/grycap/InfrastructureManager/1.19.0
 
 @app.api_route("/infrastructures",
                methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"],
@@ -104,6 +105,74 @@ async def proxy_infrastructures_sub(request: FastAPIRequest):
     return await forward_request(request)
 
 
+@app.api_route("/clouds/{path:path}",
+               methods=["GET"],
+               summary="Proxy interface to IM (for /clouds endpoints)",
+               description="Proxy interface to IM (for /clouds endpoints)")
+async def proxy_infrastructures_sub(request: FastAPIRequest):
+    """Define the route for any sub-path of the /clouds endpoint.
+
+    This function is called when any subpath of /clouds is called with the GET HTTP verb.
+    The FastAPI request is received and also proxied to the forward_request function.
+
+    Args:
+        request: The FastAPI request object instance
+    """
+
+    return await forward_request(request)
+
+
+@app.api_route("/version",
+               methods=["GET"],
+               summary="Proxy interface to IM (for /version endpoint)",
+               description="Proxy interface to IM (for /version endpoint)")
+async def proxy_infrastructures_sub(request: FastAPIRequest):
+    """Define the route for the /version endpoint.
+
+    This function is called when the /version endpoint is called with the GET HTTP verb.
+    The FastAPI request is received and also proxied to the forward_request function.
+
+    Args:
+        request: The FastAPI request object instance
+    """
+
+    return await forward_request(request)
+
+
+@app.api_route("/stats",
+               methods=["GET"],
+               summary="Proxy interface to IM (for /stats endpoint)",
+               description="Proxy interface to IM (for /stats endpoint)")
+async def proxy_infrastructures_sub(request: FastAPIRequest):
+    """Define the route for the /stats endpoint.
+
+    This function is called when the /stats endpoint is called with the GET HTTP verb.
+    The FastAPI request is received and also proxied to the forward_request function.
+
+    Args:
+        request: The FastAPI request object instance
+    """
+
+    return await forward_request(request)
+
+
+@app.api_route("/oai",
+               methods=["GET"],
+               summary="Proxy interface to IM (for /oai endpoints)",
+               description="Proxy interface to IM (for /oai endpoints)")
+async def proxy_infrastructures_sub(request: FastAPIRequest):
+    """Define the route for the /oai endpoint.
+
+    This function is called when the /oai endpoint is called with the GET HTTP verb.
+    The FastAPI request is received and also proxied to the forward_request function.
+
+    Args:
+        request: The FastAPI request object instance
+    """
+
+    return await forward_request(request)
+
+
 async def forward_request(request: FastAPIRequest):
     """Forward the incoming request to the target InfrastructureManager deployment.
 
@@ -124,10 +193,10 @@ async def forward_request(request: FastAPIRequest):
     try:
         # The body must be retrieved at this stage because the library is not async.
         request_body = await request.body()
-        # An instance of the IMReuestAdapter is created passing the incoming request and the request body (i.e. the TOSCA template) .
+        # An instance of the IMRequestAdapter is created passing the incoming request and the request body (i.e. the TOSCA template) .
         adapter = IMRequestAdapter(request, request_body)
         try:
-            # The request and header objects are incapsulated into the IMRequestAdapter instance.
+            # The request and header objects are encapsulated into the IMRequestAdapter instance.
             backend_response = IMClient.request(adapter.request, adapter.header)
         except Exception as e:
             # Relaying the exception to ensure consistency with FastAPI data types.
