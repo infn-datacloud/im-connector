@@ -2,6 +2,8 @@ import enum
 
 
 class CloudProviderType(str, enum.Enum):
+    """Enumeration representing all the Cloud Providers supported by the IM."""
+
     INFRASTRUCTUREMANAGER = "InfrastructureManager"
     VMRC = "VMRC"
     OPENNEBULA = "OpenNebula"

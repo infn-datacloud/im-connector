@@ -11,7 +11,16 @@ logger = get_logger(settings)
 
 
 def swagger_endpoint_to_regex(swagger_path: str) -> re.Pattern:
-    """Convert a Swagger-like path (with {param}) into a regex pattern."""
+    """Convert a Swagger-like path (with {param}) into a regex pattern.
+
+    Args:
+        swagger_path: a templated URL, as specified by the IM OpenApi document.
+
+    Returns:
+        re.Pattern: a regex pattern to analyze concrete requests URL, recognize the underlying IM request and isolate the request-specific path parameters.
+
+    """
+
     regex = re.escape(swagger_path)
     regex = regex.replace(r'\{', '{').replace(r'\}', '}')
     regex = re.sub(r'\{[^/}]+\}', r'[^/]+', regex)
@@ -19,6 +28,8 @@ def swagger_endpoint_to_regex(swagger_path: str) -> re.Pattern:
 
 
 class IMEndpointMap:
+
+    # Dict mapping IM REST API endpoints to an IMRequestType enum entry.
     _endpoint_patterns = {
         "/version": IMRequestType.VERSION,
         "/stats": IMRequestType.GET_IM_SERVER_STATS,
@@ -46,10 +57,28 @@ class IMEndpointMap:
         "/oai": IMRequestType.GET_OAI_PMH_TOSCA_INFO
     }
 
+    # Dict of compiled regex patterns, one for each request type defined in the dict above.
     _compiled_patterns = {swagger_endpoint_to_regex(k): v for k, v in _endpoint_patterns.items()}
 
     @classmethod
     def identify_request_type(cls, path: str, method: str) -> IMRequestType:
+        """Identify the IM request type based on the request URL and HTTP verb used.
+
+        The requests URL is matched against the regex patterns defined above and an IMRequestType enum entry is obtained.
+        If the request type is ambiguous, the selection is further refined using the HTTP verb used for the request.
+        If the request is unknown, an ValueError exception is raised.
+
+        Args:
+            path: the actual request URL, as received by the IM Dispatcher.
+
+            method: the HTTP verb used for the incoming request
+
+        Returns:
+            IMRequestType: the IM request enum entry corresponding to the requested incoming URL-HTTP verb pair.
+
+
+        """
+
         request_type: IMRequestType = IMRequestType.NONE
         for regex, enum_value in IMEndpointMap._compiled_patterns.items():
             if regex.match(path):
@@ -96,7 +125,20 @@ class IMEndpointMap:
         return request_type
 
     @classmethod
-    def extract_path_params(cls, path: str) -> dict:
+    def extract_path_params(cls, path: str) -> dict[str, str]:
+        """Extract the path parameters of the recived request.
+
+        Path parameters are extracted by matching the incoming request URL to the OpenApi URL definitions.
+
+        Args:
+            path: the actual request URL, as received by the IM Dispatcher.
+
+        Returns:
+            dict[str, str]: Dict containing key:value pairs for the identified path parameters. Key names are case-sensitive and are
+                            used to create instances of IMPathParametersBase-inheriting classes.
+
+        """
+
         for pattern in IMEndpointMap._endpoint_patterns.keys():
             regex_pattern = re.sub(r"\{(\w+)\}", r"(?P<\1>[^/]+)", pattern)
             regex_pattern = f"^{regex_pattern}$"
@@ -107,6 +149,13 @@ class IMEndpointMap:
 
     @classmethod
     def sanitize_query_params(cls, query: QueryParams) -> dict:
+        """Sanitize query parameter names to void conflict with python's reserved keywords.
+
+        E.g. the "async" query parameter defined in the IM REST API is renamed to "async_".
+        This is later used to build the IMQueryParametersBase-inheriting classes.
+
+        """
+
         sanitized_query_params = {}
         for k, v in query.items():
             if k in {"async"}:

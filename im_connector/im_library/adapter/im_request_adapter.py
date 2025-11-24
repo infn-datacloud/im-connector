@@ -5,13 +5,15 @@ from typing_extensions import Any
 
 from im_connector.config import get_settings
 from im_connector.im_library.adapter.im_endpoint_map import IMEndpointMap
-from im_connector.im_library.client.im_requests.add_resources_to_infrastructure import AddResourceToInfrastructurePathParameters, \
+from im_connector.im_library.client.im_requests.add_resources_to_infrastructure import \
+    AddResourceToInfrastructurePathParameters, \
     AddResourcesToInfrastructure, AddResourcesToInfrastructureQueryParameters
 from im_connector.im_library.client.im_requests.alter_vm import AlterVMPathParameters, AlterVM
 from im_connector.im_library.client.im_requests.change_infrastructure_authorization_data import \
     ChangeInfrastructureAuthorizationDataPathParameters, ChangeInfrastructureAuthorizationData, \
     ChangeInfrastructureAuthorizationDataQueryParameters
-from im_connector.im_library.client.im_requests.create_disk_snapshot import CreateDiskSnapshot, CreateDiskSnapshotPathParameters, \
+from im_connector.im_library.client.im_requests.create_disk_snapshot import CreateDiskSnapshot, \
+    CreateDiskSnapshotPathParameters, \
     CreateDiskSnapshotQueryParameters
 from im_connector.im_library.client.im_requests.create_infrastructure import CreateInfrastructure, \
     CreateInfrastructureQueryParameters
@@ -20,11 +22,13 @@ from im_connector.im_library.client.im_requests.delete_infrastructure import Del
 from im_connector.im_library.client.im_requests.delete_vm import DeleteVM, DeleteVMPathParameters
 from im_connector.im_library.client.im_requests.export_infrastructure import ExportInfrastructure, \
     ExportInfrastructurePathParameters, ExportInfrastructureQueryParameters
-from im_connector.im_library.client.im_requests.get_cloud_provider_available_images_list import GetCloudProviderAvailableImagesList, \
+from im_connector.im_library.client.im_requests.get_cloud_provider_available_images_list import \
+    GetCloudProviderAvailableImagesList, \
     GetCloudProviderAvailableImagesListPathParameters, GetCloudProviderAvailableImagesListQueryParameters
 from im_connector.im_library.client.im_requests.get_cloud_provider_user_quotas import GetCloudProviderUserQuotas, \
     GetCloudProviderUserQuotasPathParameters
-from im_connector.im_library.client.im_requests.get_im_server_stats import GetIMServerStats, GetIMServerStatsQueryParameters
+from im_connector.im_library.client.im_requests.get_im_server_stats import GetIMServerStats, \
+    GetIMServerStatsQueryParameters
 from im_connector.im_library.client.im_requests.get_infrastructure_contextualization_message import \
     GetInfrastructureContextualizationMessage, GetInfrastructureContextualizationMessagePathParameters, \
     GetInfrastructureContextualizationMessageQueryParameters
@@ -36,7 +40,8 @@ from im_connector.im_library.client.im_requests.get_infrastructure_owners_list i
     GetInfrastructureOwnersListPathParameters
 from im_connector.im_library.client.im_requests.get_infrastructure_state import GetInfrastructureState, \
     GetInfrastructureStatePathParameters
-from im_connector.im_library.client.im_requests.get_infrastructure_tosca_representation import GetInfrastructureToscaRepresentation, \
+from im_connector.im_library.client.im_requests.get_infrastructure_tosca_representation import \
+    GetInfrastructureToscaRepresentation, \
     GetInfrastructureToscaRepresentationPathParameters
 from im_connector.im_library.client.im_requests.get_oai_pmh_tosca_info import GetOAIPMHToscaInfo
 from im_connector.im_library.client.im_requests.get_vm_contextualization_message import GetVMContextualizationMessage, \
@@ -51,9 +56,11 @@ from im_connector.im_library.client.im_requests.list_user_infrastructures import
 from im_connector.im_library.client.im_requests.reboot_vm import RebootVM, RebootVMPathParameters
 from im_connector.im_library.client.im_requests.reconfigure_infrastructure import ReconfigureInfrastructure, \
     ReconfigureInfrastructurePathParameters, ReconfigureInfrastructureQueryParameters
-from im_connector.im_library.client.im_requests.start_infrastructure import StartInfrastructure, StartInfrastructurePathParameters
+from im_connector.im_library.client.im_requests.start_infrastructure import StartInfrastructure, \
+    StartInfrastructurePathParameters
 from im_connector.im_library.client.im_requests.start_vm import StartVM, StartVMPathParameters
-from im_connector.im_library.client.im_requests.stop_infrastructure import StopInfrastructure, StopInfrastructurePathParameters
+from im_connector.im_library.client.im_requests.stop_infrastructure import StopInfrastructure, \
+    StopInfrastructurePathParameters
 from im_connector.im_library.client.im_requests.stop_vm import StopVM, StopVMPathParameters
 from im_connector.im_library.client.im_requests.version import Version
 from im_connector.im_library.entities.enums.cloud_provider_type import CloudProviderType
@@ -73,12 +80,16 @@ logger = get_logger(settings)
 
 
 class IMRequestAdapter:
+    """Parse an incoming FastAPI request from the JAVA Orchestrator and create instances of objects representing the request."""
+
+    # Dict mapping cloud provider type to the object representing its credentials.
     _headers: dict[CloudProviderType, Callable[..., IMCredentialComponentBase]] = {
         CloudProviderType.INFRASTRUCTUREMANAGER: lambda **kw: InfrastructureManagerCredentialComponent(**kw),
         CloudProviderType.OPENSTACK: lambda **kw: OpenStackCredentialComponent(**kw),
         CloudProviderType.KUBERNETES: lambda **kw: KubernetesCredentialComponent(**kw),
     }
 
+    # Dict mapping the request to be submitted to the IM to the object representing the request itself
     _im_request_map: dict[IMRequestType, Callable[..., IMBaseRequest]] = {
         IMRequestType.ADD_RESOURCES_TO_INFRASTRUCTURE: lambda **kw: AddResourcesToInfrastructure(**kw),
         IMRequestType.ALTER_VM: lambda **kw: AlterVM(**kw),
@@ -115,6 +126,8 @@ class IMRequestAdapter:
         IMRequestType.VERSION: lambda **kw: Version(**kw)
     }
 
+    # Dict mapping the IM request type to the object representing its required path parameters, if any. If the request
+    # does not require any path parameter, the dict maps the request type to None
     _im_path_parameters_map: dict[IMRequestType, Optional[Callable[..., IMPathParametersBase]]] = {
         IMRequestType.ADD_RESOURCES_TO_INFRASTRUCTURE: lambda **kw: AddResourceToInfrastructurePathParameters(**kw),
         IMRequestType.ALTER_VM: lambda **kw: AlterVMPathParameters(**kw),
@@ -153,6 +166,8 @@ class IMRequestAdapter:
         IMRequestType.VERSION: None
     }
 
+    # Dict mapping the IM request type to the object representing its required query parameters, if any. If the request
+    # does not require any query parameter, the dict maps the request type to None
     _im_query_parameters_map: dict[IMRequestType, Optional[Callable[..., IMQueryParametersBase]]] = {
         IMRequestType.ADD_RESOURCES_TO_INFRASTRUCTURE: lambda **kw: AddResourcesToInfrastructureQueryParameters(**kw),
         IMRequestType.ALTER_VM: None,
@@ -191,14 +206,33 @@ class IMRequestAdapter:
     }
 
     def __init__(self, request: FastAPIRequest, request_body: Any):
+        # Identify the IM request type based on the invoked API endpoint and the HTTP verb used for the request.
         self._im_request_type: IMRequestType = IMEndpointMap.identify_request_type(request.url.path, request.method)
-        self._query_parameters = IMEndpointMap.sanitize_query_params(request.query_params)
-        self._path_parameters = IMEndpointMap.extract_path_params(request.url.path)
+
+        # Extract query parameters received with the request and rename those conflicting with Python reserved keywords.
+        self._query_parameters: dict = IMEndpointMap.sanitize_query_params(request.query_params)
+
+        # Extract path parameters from API URL.
+        self._path_parameters: dict = IMEndpointMap.extract_path_params(request.url.path)
+
         self._body = request_body
+
+        # Create the IMHeaderComposer object instance from the request's headers (these include the authorization header).
         self._header_composer: IMHeaderComposer = self._populate_header_composer(request.headers)
 
-    @staticmethod
-    def _parse_im_auth_header(header_string: str) -> list[dict[str, str]]:
+    def _parse_im_auth_header(self, header_string: str) -> list[dict[str, str]]:
+        """Parse request authorization header (see the IM documentation for reference) into a list of dicts.
+
+        Each IM credential is represented as a dict. Multiple credentials are then packed into a list.
+
+        Args:
+            header_string: The request header string
+
+        Returns:
+            list[dict[str,str]]: The header parsed as a list of dicts. One dict for each IM credential.
+
+        """
+
         lines = [line.strip() for line in header_string.split("\\n") if line.strip()]
         result = []
         for line in lines:
@@ -212,7 +246,18 @@ class IMRequestAdapter:
         logger.info(f"[ADAPTER]: identified credentials for {[x["type"] for x in result]}.")
         return result
 
-    def _populate_header_composer(self, headers) -> IMHeaderComposer:
+
+    def _populate_header_composer(self, headers: str) -> IMHeaderComposer:
+        """Create an IMHeaderComposer instance and load authorization credentials into it.
+
+        Args:
+            headers: The request header as a string.
+
+        Returns:
+            IMHeaderComposer: An instance of the IMHeaderComposer object, responsible for serializing the header objects to a string.
+
+        """
+
         auth_header_dict: list[dict[str, str]] = self._parse_im_auth_header(headers["Authorization"])
         composer = IMHeaderComposer()
         for cred in auth_header_dict:
@@ -226,6 +271,15 @@ class IMRequestAdapter:
 
     @property
     def request(self) -> IMBaseRequest:
+        """The instance of the object representing the incoming request. All requests inherit from IMBaseRequest.
+
+        Based on the request URL, HTTP verb and parameters, an instnace of the corresponding request object is created.
+
+        Returns:
+            IMBaseRequest: the actual IM request object represented as its base class.
+
+        """
+
         request_args = {}
 
         path_parameters = IMRequestAdapter._im_path_parameters_map[self._im_request_type]
@@ -247,4 +301,11 @@ class IMRequestAdapter:
 
     @property
     def header(self) -> IMHeaderComposer:
+        """The instance of the IMHeaderComposer containing all the authorization credentials and all relevant headers received with the request.
+
+        Returns:
+            IMHeaderComposer: an instance of the IMHeaderComposer helper class with all the header data stored.
+
+        """
+
         return self._header_composer

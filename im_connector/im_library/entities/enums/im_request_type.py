@@ -2,6 +2,8 @@ import enum
 
 
 class IMRequestType(str, enum.Enum):
+    """Enumeration representing all operations supported by the IM."""
+
     ADD_RESOURCES_TO_INFRASTRUCTURE = "add_resources_to_infrastructure"
     ALTER_VM = "alter_vm"
     CHANGE_INFRASTRUCTURE_AUTHORIZATION_DATA = "change_infrastructure_authorization_data"
@@ -33,6 +35,10 @@ class IMRequestType(str, enum.Enum):
     STOP_INFRASTRUCTURE = "stop_infrastructure"
     STOP_VM = "stop_vm"
     VERSION = "version"
+
+    # Some IM REST API endpoints use the same URL and can only be identified by evaluating the used HTTP verb.
+    # The following enum entries are meant to identify such cases, which then require further analysis.
+    # This is only used by the IMRequestAdapter workflow.
 
     INFRASTRUCTURE_CHECK_METHOD = "infrastructure_check_method"
     INFID_CHECK_METHOD = "infid_check_method"

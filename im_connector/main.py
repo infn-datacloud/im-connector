@@ -75,6 +75,15 @@ app.add_middleware(
                summary="Proxy interface to IM",
                description="Proxy interface to IM")
 async def proxy_infrastructures_root(request: FastAPIRequest):
+    """Define the route for the /infrastructure endpoint.
+
+    This function is called when /infrastructures is called with any HTTP verb.
+    The FastAPI request is received and proxied to the forward_request function
+
+    Args:
+        request: The FastAPI request
+    """
+
     return await forward_request(request)
 
 
@@ -83,17 +92,45 @@ async def proxy_infrastructures_root(request: FastAPIRequest):
                summary="Proxy interface to IM (with subpath)",
                description="Proxy interface to IM (with subpath)")
 async def proxy_infrastructures_sub(request: FastAPIRequest):
+    """Define the route for any sub-path of the /infrastructures endpoint.
+
+    This function is called when any subpath of /infrastructures is called with any HTTP verb.
+    The FastAPI request is received and also proxied to the forward_request function.
+
+    Args:
+        request: The FastAPI request object instance
+    """
+
     return await forward_request(request)
 
 
 async def forward_request(request: FastAPIRequest):
+    """Forward the incoming request to the target InfrastructureManager deployment.
+
+    The incoming request, received as a fastapi Request object, is parsed by the IMRequestAdapter.
+    The header is disassembled and instances of objects representing the authorization credentials are created.
+    Instances of objects representing the actual requests (e.g. create an infrastructure) are created.
+
+    Header and requests objects are then passed to the IMClient.request method to be forwarded to the target IM deployment.
+    The response from the IM is then converted into a fastapi Response object and returned to the caller.
+
+    HTTP Exceptions are handled and logged.
+
+    Args:
+        request: The FastAPI request object instance.
+
+    """
+
     try:
+        # The body must be retrieved at this stage because the library is not async.
         request_body = await request.body()
+        # An instance of the IMReuestAdapter is created passing the incoming request and the request body (i.e. the TOSCA template) .
         adapter = IMRequestAdapter(request, request_body)
         try:
+            # The request and header objects are incapsulated into the IMRequestAdapter instance.
             backend_response = IMClient.request(adapter.request, adapter.header)
         except Exception as e:
-            # Relaying the exception to ensure consistency with FastAPI data types
+            # Relaying the exception to ensure consistency with FastAPI data types.
             raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=e)
 
         if not backend_response.ok:

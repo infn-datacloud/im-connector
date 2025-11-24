@@ -4,6 +4,8 @@ from im_connector.im_library.entities.im_credential_component_base import IMCred
 
 
 class KubernetesCredentialComponent(IMCredentialComponentBase):
+    """Concrete class representing Kubernetes credential."""
+
     def __init__(self, *,
                  id: str = "kub",
                  type: str = "Kubernetes",

@@ -4,6 +4,8 @@ from im_connector.im_library.entities.im_credential_component_base import IMCred
 
 
 class OpenStackCredentialComponent(IMCredentialComponentBase):
+    """Concrete class representing OpenStack credential."""
+
     def __init__(self, *,
                  id: str = "os",
                  type: str = "OpenStack",

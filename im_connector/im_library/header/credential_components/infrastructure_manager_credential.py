@@ -4,6 +4,8 @@ from im_connector.im_library.entities.im_credential_component_base import IMCred
 
 
 class InfrastructureManagerCredentialComponent(IMCredentialComponentBase):
+    """Concrete class representing IM credential."""
+
     def __init__(self, *,
                  id: str = "im",
                  type: str = "InfrastructureManager",
