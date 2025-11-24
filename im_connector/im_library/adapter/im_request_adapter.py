@@ -247,7 +247,7 @@ class IMRequestAdapter:
         return result
 
 
-    def _populate_header_composer(self, headers: str) -> IMHeaderComposer:
+    def _populate_header_composer(self, headers) -> IMHeaderComposer:
         """Create an IMHeaderComposer instance and load authorization credentials into it.
 
         Args:
