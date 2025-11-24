@@ -25,6 +25,13 @@ The `im_library` folder is structured as follows:
 - `header`: subfolder containing the implementation of the `IMHeaderComposer` class required to load all required credentials and headers and to serialize them before sending the request to the IM
 - `header/credential_components`: subfolder containing the object representing authorization data for IM, OpenStack and Kubernetes. More can be implemented as needed. 
 
+### Operations workflow
+
+1. The general architecture of the IM Dispatcher is presented ![here](docs/im_dispatcher_flow.pdf)
+2. The block diagram of the IMRequestAdapter is presented ![here](docs/im_request_adapter_flow.pdf)
+3. The block diagram of the IMClient is presented ![here](docs/im_client_flow.pdf)
+4. A real-life example of the interaction between the library components i presented ![here](docs/example_workflow.pdf)
+
 ## IM Adapter
 
 **N.B.:** This component is only required to interface the IM Client library to the FastAPI app. Eventually, once the Kafka-based architecture is in production, this will be deprecated.
@@ -66,11 +73,15 @@ Actual requests inherit from one of these partial classes.
 
 Thorough type hints guide the user in the object creation process.
 
+The complete catalog of all available IM request objects is under `client/im_requests`. One python file contains the definition of a single request and of all its dependencies.
+
 ### Credential header components
 
 Similarly to the request types, authorization credentials are represented by the `IMCredentialComponentBase` class, which provides a common interface to manipulate request headers.
 
 For each cloud provider, a concrete credential component is defined.
+
+The complete catalog of the currently implemented credential components is under `header/credential_components`. One python file contains the definition of a single credential.
 
 ### Usage example
 
