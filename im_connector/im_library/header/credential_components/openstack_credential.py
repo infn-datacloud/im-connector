@@ -14,6 +14,7 @@ class OpenStackCredentialComponent(IMCredentialComponentBase):
                  host: Optional[str] = None,
                  token: Optional[str] = None,
                  proxy: Optional[str] = None,
+                 tenant: Optional[str] = None,
                  domain: Optional[str] = None,
                  auth_version: Optional[str] = "2.0_password",
                  api_version: Optional[str] = "v2",
@@ -33,6 +34,7 @@ class OpenStackCredentialComponent(IMCredentialComponentBase):
         self.host = host
         self.token = token
         self.proxy = proxy
+        self.tenant = tenant
         self.domain = domain
         self.auth_version = auth_version
         self.api_version = api_version
