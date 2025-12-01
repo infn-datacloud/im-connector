@@ -19,16 +19,18 @@ def get_logger(settings: Settings) -> logging.Logger:
         logging.Logger: The configured logger instance.
 
     """
-    formatter = logging.Formatter(
-        "%(asctime)s %(levelname)s %(name)s "
-        "[%(processName)s: %(process)d - %(threadName)s: %(thread)d] "
-        "%(message)s"
-    )
-    stream_handler = logging.StreamHandler()
-    stream_handler.setFormatter(formatter)
-
     logger = logging.getLogger("orchestrator-im-connector")
     logger.setLevel(level=settings.LOG_LEVEL)
-    logger.addHandler(stream_handler)
 
+    if not logger.handlers:
+        formatter = logging.Formatter(
+            "%(asctime)s %(levelname)s %(name)s "
+            "[%(processName)s: %(process)d - %(threadName)s: %(thread)d] "
+            "%(message)s"
+        )
+        stream_handler = logging.StreamHandler()
+        stream_handler.setFormatter(formatter)
+        logger.addHandler(stream_handler)
+
+    logger.propagate = False
     return logger

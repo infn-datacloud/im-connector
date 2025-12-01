@@ -10,18 +10,6 @@ from pydantic import AnyHttpUrl, BeforeValidator, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class AuthenticationMethodsEnum(str, Enum):
-    """Enumeration of supported authentication methods."""
-
-    local = "local"
-
-
-class AuthorizationMethodsEnum(str, Enum):
-    """Enumeration of supported authorization methods."""
-
-    opa = "opa"
-
-
 class LogLevelEnum(int, Enum):
     """Enumeration of supported logging levels."""
 
@@ -57,26 +45,6 @@ class Settings(BaseSettings):
     ALLOWED_ORIGINS: Annotated[
         list[AnyHttpUrl] | Literal["*"],
         Field(default_factory=list, description="List of allowed CORS origins"),
-    ]
-    AUTHN_MODE: Annotated[
-        AuthenticationMethodsEnum | None,
-        Field(
-            default=None,
-            description="Authentication method to use. Allowed values: local",
-        ),
-    ]
-    AUTHZ_MODE: Annotated[
-        AuthorizationMethodsEnum | None,
-        Field(
-            default=None, description="Authorization method to use. Allowed values: opa"
-        ),
-    ]
-    TRUSTED_IDP_LIST: Annotated[
-        list[AnyHttpUrl],
-        Field(
-            default_factory=list,
-            description="List of the application trusted identity providers",
-        ),
     ]
     LOG_LEVEL: Annotated[
         LogLevelEnum,
